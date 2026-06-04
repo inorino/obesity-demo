@@ -345,9 +345,9 @@
   <div class="row2">
     <div class="half">
       <div class="ladder">
-        <div class="nest n6" data-anim><span class="n em-amber">6</span><div class="lab">Core_6（最簡可行模型）</div><div class="desc">純行為：睡眠/吸菸/飲酒/運動/自評健康</div></div>
-        <div class="nest n15" data-anim><span class="n em-green">15</span><div class="lab">Behav_15（移除慢性病）</div><div class="desc">不需病史也能預測？</div></div>
-        <div class="nest n25" data-anim><span class="n accent">25</span><div class="lab">Full_25（上限 Baseline）</div><div class="desc">行為 + 健康 + 7 項慢性病 + 人口統計</div></div>
+        <div class="nest n6" data-anim><span class="n em-amber">6</span><div class="lab">Core_6（最簡可行模型）</div><div class="desc">純可控行為：睡眠／吸菸／飲酒／運動／自評健康</div></div>
+        <div class="nest n15" data-anim><span class="n em-green">15</span><div class="lab">Behav_15（移除慢性病）</div><div class="desc">行為 + 健康狀態 + 人口統計（不含 7 項慢性病）</div></div>
+        <div class="nest n25" data-anim><span class="n accent">25</span><div class="lab">Full_25（上限 Baseline）</div><div class="desc">行為 + 健康狀態 + 7 項慢性病 + 人口統計</div></div>
       </div>
     </div>
     <div class="half" data-anim><div class="imgcard" style="max-width:440px;"><img src="assets/img/s07_pyramid.png" alt="三層特徵金字塔"></div></div>
@@ -423,7 +423,7 @@
 
 <!-- 13 KEY FINDING -->
 <section class="slide" data-slide="m13">
-  <div class="head"><h2 data-anim>🔑 關鍵發現：<span class="k">行為勝過慢性病史</span></h2></div>
+  <div class="head"><h2 data-anim>🔑 關鍵發現：<span class="k">行為勝過慢性病史</span></h2><div class="lead" data-anim>數字皆為二元 Binary F1</div></div>
   <div class="kf">
     <div class="kf-box" data-anim><div class="v accent">0.6867</div><div class="l">Full_25（含 7 項病歷）</div></div>
     <div class="kf-eq" data-anim>−</div>
@@ -436,7 +436,7 @@
 
 <!-- 14 IMPORTANCE -->
 <section class="slide" data-slide="m14">
-  <div class="head"><h2 data-anim>特徵重要度排行（Full_25 · Binary XGBoost）</h2></div>
+  <div class="head"><h2 data-anim>特徵重要度排行（Full_25 · 二元 Binary XGBoost）</h2></div>
   <div class="imp" id="imp14">
     <div class="imp-row" data-anim><div class="imp-name">自評健康 GENHLTH</div><div class="imp-track"><div class="imp-fill" data-w="100" style="background:linear-gradient(90deg,#7f1d1d,#b91c1c)"></div></div><div class="imp-val">0.120</div></div>
     <div class="imp-row" data-anim><div class="imp-name">年齡層 Age_Group</div><div class="imp-track"><div class="imp-fill" data-w="92" style="background:linear-gradient(90deg,#9a3412,#c2410c)"></div></div><div class="imp-val">0.110</div></div>
@@ -787,9 +787,10 @@ const zoomLayer=document.getElementById('imgZoom'), zoomImg=zoomLayer.querySelec
 function hideZoom(){ zoomLayer.classList.remove('show'); }
 function bindModalImgZoom(){
   modalCard.querySelectorAll('.ev-imgs img').forEach(img=>{
-    img.addEventListener('mouseenter',()=>{ if(img._sup) return; zoomImg.src=img.src; zoomLayer.classList.add('show'); });
+    // 用 mousemove：游標真的移動到圖上才放大；剛開 modal 游標不動 → 不反應
+    img.addEventListener('mousemove',()=>{ if(img._sup) return; if(zoomImg.src!==img.src) zoomImg.src=img.src; zoomLayer.classList.add('show'); });
     img.addEventListener('mouseleave',()=>{ hideZoom(); img._sup=false; });
-    img.addEventListener('click',(e)=>{ e.stopPropagation(); hideZoom(); img._sup=true; });  // 點一下縮回
+    img.addEventListener('click',(e)=>{ e.stopPropagation(); hideZoom(); img._sup=true; });  // 點一下縮回，移開再回來才會再放大
   });
 }
 
