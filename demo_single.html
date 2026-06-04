@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30 秒試打 · 肥胖風險與 16 週走勢 · 第五組</title>
+<style>
+  :root{
+    --bg:#0b1120; --bg2:#111a2e; --card:#16213e; --card2:#1b2747; --line:#2a3a63; --ink:#e8eefc; --muted:#90a0c2;
+    --blue:#3b82f6; --blue2:#60a5fa; --green:#10b981; --green2:#34d399; --amber:#f59e0b; --amber2:#fbbf24; --red:#ef4444; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;
+    padding:16px clamp(14px,3vw,38px) 64px; min-height:100vh; max-width:1100px; margin:0 auto;}
+  h1{font-size:clamp(19px,2.6vw,28px);} .muted{color:var(--muted);} .accent{color:var(--blue2);} b{color:#fff;}
+  a.back{color:var(--muted); text-decoration:none; font-size:14px; border:1px solid var(--line); padding:7px 14px; border-radius:9px; display:inline-block;}
+  a.back:hover{color:var(--ink); border-color:var(--blue2);}
+  .topbar{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:14px; margin:10px 0 18px;}
+  .sub{color:var(--muted); font-size:13.5px; margin-top:5px;}
+  .ctl label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px;}
+  select,input{font-size:14px; padding:9px 12px; border-radius:9px; border:1px solid var(--line); background:var(--card); color:var(--ink); width:100%;}
+  select{cursor:pointer;}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px clamp(14px,2.5vw,22px); margin-bottom:20px;}
+  .sect-t{font-size:13px; color:var(--muted); margin:16px 0 9px; letter-spacing:.5px;}
+  .sect-t:first-child{margin-top:0;}
+  .form{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
+  @media(min-width:680px){.form.wide{grid-template-columns:1fr 1fr 1fr;}}
+  .f label{font-size:11.5px; color:var(--muted); display:block; margin-bottom:4px;}
+  .f.col2{grid-column:1/3;}
+
+  .runbtn{margin-top:16px; width:100%; padding:13px; border:none; border-radius:11px; cursor:pointer; font-weight:800; font-size:15.5px;
+    background:linear-gradient(90deg,var(--violet),var(--blue2)); color:#06122b;}
+  .runbtn:disabled{opacity:.55; cursor:default;}
+
+  .resultwrap{display:none; padding:8px 6px 4px; align-items:center; gap:18px; flex-wrap:wrap;}
+  .resultwrap.show{display:flex;}
+  .gauge{width:170px; height:100px; position:relative; flex:none;}
+  .gauge svg{width:100%; height:100%;} .gauge .pct{position:absolute; bottom:0; left:0; right:0; text-align:center; font-size:26px; font-weight:800;}
+  .rtxt{font-size:14px; color:var(--muted); line-height:1.8;} .rtxt b{color:var(--ink);}
+  .tag{font-size:12px; padding:3px 11px; border-radius:999px; font-weight:700;}
+  .tag-g{background:#0b3b2e; color:var(--green2);} .tag-y{background:#3b300b; color:var(--amber2);} .tag-r{background:#3b1414; color:#fca5a5;}
+  #apiStat{position:absolute; top:12px; right:16px; max-width:48%; font-size:13px; color:var(--muted); text-align:right; z-index:6;}
+
+  /* 真實 API 證據面板 */
+  .apiproof{display:none; margin:4px 6px 8px; padding:12px 14px; background:#070d1a; border:1px solid #243152; border-radius:10px;
+    font-family:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace; font-size:12px; color:#9fb3d6; white-space:pre-wrap; word-break:break-all; line-height:1.55;}
+  .apiproof.show{display:block;} .apiproof b{color:#cfe0ff; font-weight:700;} .apiproof .ok{color:var(--green2); font-weight:700;}
+  .prooflink{display:none; margin:0 6px 10px; font-size:12.5px; color:var(--muted);}
+  .apiproof.show + .prooflink{display:block;} .prooflink a{color:var(--blue2); text-decoration:none;} .prooflink a:hover{text-decoration:underline;}
+
+  /* 結果區（儀表板+雙曲線整合成一整塊面板）＋ Loading 大字覆蓋 */
+  .results{display:none; position:relative; margin-bottom:20px;}
+  .results.show{display:block; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px clamp(12px,2vw,18px);}
+  .results.loading{min-height:300px;}
+  .results .chart-box{background:transparent;}        /* 內層去底色，只留改善/惡化色框 */
+  .loadbig{display:none; position:absolute; inset:0; align-items:center; justify-content:center; text-align:center; padding:18px; pointer-events:none; z-index:5;}
+  .loadbig.show{display:flex;}
+  .loadbig span{font-size:clamp(20px,3.6vw,40px); font-weight:800; color:#cfe0ff; text-shadow:0 3px 24px rgba(0,0,0,.55);}
+
+  /* 模擬雙圖 */
+  .sim{display:none;} .sim.show{display:block;}
+  .simhead{font-size:clamp(17px,2.2vw,22px); font-weight:800; margin:4px 0 4px;}
+  .simsub{color:var(--muted); font-size:13.5px; margin-bottom:16px;}
+  .two{display:grid; grid-template-columns:1fr; gap:18px;}
+  @media(min-width:820px){.two{grid-template-columns:1fr 1fr;}}
+  .chart-box{position:relative; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px;}
+  .chart-box.improve{border-color:#1c5b46;} .chart-box.worsen{border-color:#5b2330;}
+  .ct{font-size:16px; font-weight:800; margin-bottom:2px;} .ct.g{color:var(--green2);} .ct.r{color:#fca5a5;}
+  .cs{color:var(--muted); font-size:12.5px; margin-bottom:8px;}
+  .lc-legend{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:8px; font-size:12.5px; color:var(--muted);}
+  .lc-legend span{display:flex; align-items:center; gap:6px;} .lc-legend i{width:16px; height:4px; border-radius:2px;}
+</style>
+</head>
+<body>
+
+<a class="back" href="presentation.html#16">← 返回簡報（Demo 頁）</a>
+<div class="topbar">
+  <div>
+    <h1>⚡ 30 秒試打 · 你的肥胖風險與 16 週走勢</h1>
+    <div class="sub">填今天的生活習慣 → 真打一次 API 拿到風險機率 → 看「持續改善」與「持續惡化」兩種未來模擬。</div>
+  </div>
+  <div class="ctl" style="min-width:190px;">
+    <label>模型版本</label>
+    <select id="modelSel"><option value="core6">Core_6（6 項行為）</option><option value="behav15">Behav_15（15 項）</option></select>
+  </div>
+</div>
+
+<div class="card">
+  <div class="sect-t">📝 填今天一天</div>
+  <div class="form">
+    <div class="f"><label>身高 cm</label><input type="number" step="1" min="120" max="220" id="height" value="170"></div>
+    <div class="f"><label>體重 kg (20–400)</label><input type="number" step="0.1" min="20" max="400" id="weight" value="78"></div>
+    <div class="f"><label>睡眠 h (1–24)</label><input type="number" step="0.5" min="1" max="24" id="sleep_hours" value="6.5"></div>
+    <div class="f"><label>吸菸</label><select id="smoking_status"><option value="4">從未</option><option value="3">已戒</option><option value="2">偶爾</option><option value="1">每日</option></select></div>
+    <div class="f"><label>飲酒</label><select id="drank_any"><option value="0">無</option><option value="1">有</option></select></div>
+    <div class="f"><label>週飲酒杯數 (0–140)</label><input type="number" step="1" min="0" max="140" id="drinks_per_week" value="3"></div>
+    <div class="f"><label>運動</label><select id="exercised"><option value="1">有</option><option value="0">無</option></select></div>
+    <div class="f"><label>自評健康</label><select id="general_health"></select></div>
+  </div>
+
+  <div id="behavBox" style="display:none;">
+    <div class="sect-t">👤 人口統計（Behav_15 才需要）</div>
+    <div class="form wide">
+      <div class="f"><label>性別</label><select id="sex"><option value="1">男</option><option value="0">女</option></select></div>
+      <div class="f"><label>年齡組</label><select id="age_group"></select></div>
+      <div class="f"><label>教育程度</label><select id="education"></select></div>
+      <div class="f"><label>家庭年收入</label><select id="income"></select></div>
+      <div class="f"><label>就業狀態</label><select id="employment"></select></div>
+      <div class="f"><label>行走困難</label><select id="diff_walking"><option value="0">否</option><option value="1">是</option></select></div>
+      <div class="f"><label>憂鬱症史</label><select id="depression"><option value="0">否</option><option value="1">是</option></select></div>
+      <div class="f"><label>心理不健康天數 (0–30)</label><input type="number" step="1" min="0" max="30" id="mental_health_days" value="3"></div>
+      <div class="f"><label>身體不健康天數 (0–30)</label><input type="number" step="1" min="0" max="30" id="physical_health_days" value="2"></div>
+    </div>
+  </div>
+
+  <button class="runbtn" id="runBtn">▶ 送出打 API · 看我的風險</button>
+</div>
+
+<div class="results" id="results">
+  <div class="rcontent" id="rcontent">
+    <div class="resultwrap" id="resultwrap">
+      <div class="gauge"><svg viewBox="0 0 200 110"><path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#27355a" stroke-width="16" stroke-linecap="round"/><path id="gArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--blue2)" stroke-width="16" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition:stroke-dashoffset 1.1s,stroke .4s;"/></svg><div class="pct" id="gPct">--%</div></div>
+      <div class="rtxt" id="rtxt"></div>
+    </div>
+    <div id="apiStat"></div>
+
+    <div class="apiproof" id="apiProof"></div>
+    <div class="prooflink"><a href="https://obesity-api-2-2ro4.onrender.com/docs" target="_blank">🔗 不信？開後端 API /docs 現場打給大家看</a> ·　按 F12 → Network 也能看到這個 POST 請求</div>
+
+    <div class="sim" id="sim">
+      <div class="simhead">📈 未來 16 週模擬（從你目前的 <span id="p0lbl" class="accent">--%</span> 出發）</div>
+      <div class="simsub">左軸＝過重+肥胖機率 ｜ 右軸＝模擬 BMI ｜ 紅虛線＝BMI 25 過重門檻。起點為真實 API 結果，後續為趨勢模擬。</div>
+      <div class="two">
+        <div class="chart-box improve">
+          <div class="ct g">🟢 持續改善型</div>
+          <div class="cs">睡飽、戒菸少酒、規律運動、體重下降</div>
+          <svg id="lcImprove" viewBox="0 0 480 320" style="width:100%; height:auto;"></svg>
+          <div class="lc-legend"><span><i style="background:#60a5fa"></i>機率</span><span><i style="background:#fbbf24"></i>模擬 BMI</span></div>
+        </div>
+        <div class="chart-box worsen">
+          <div class="ct r">🔴 持續惡化型</div>
+          <div class="cs">熬夜、菸酒不忌、久坐不動、體重上升</div>
+          <svg id="lcWorsen" viewBox="0 0 480 320" style="width:100%; height:auto;"></svg>
+          <div class="lc-legend"><span><i style="background:#60a5fa"></i>機率</span><span><i style="background:#fbbf24"></i>模擬 BMI</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="loadbig" id="loadBig"><span></span></div>
+</div>
+
+<script src="assets/js/gsap.min.js"></script>
+<script>
+const API='https://obesity-api-2-2ro4.onrender.com';
+const GH={1:'非常好',2:'很好',3:'普通',4:'不太好',5:'很差'};
+const EDU={1:'未受教育',2:'小學',3:'國高中',4:'高中畢業',5:'專科/大學肄業',6:'大學以上'};
+const INC={1:'<$15k',2:'$15–25k',3:'$25–35k',4:'$35–50k',5:'$50–100k',6:'$100–150k',7:'$150–200k',8:'≥$200k'};
+const AGE={1:'18–24',2:'25–29',3:'30–34',4:'35–39',5:'40–44',6:'45–49',7:'50–54',8:'55–59',9:'60–64',10:'65–69',11:'70–74',12:'75–79',13:'80+'};
+const EMP={1:'全職',2:'兼職',3:'自雇',4:'待業(>1年)',5:'待業(<1年)',6:'家管',7:'學生',8:'退休/無法工作'};
+const opt=(m,sel)=>Object.entries(m).map(([v,t])=>`<option value="${v}" ${v==sel?'selected':''}>${v} · ${t}</option>`).join('');
+const ghOpt=()=>[1,2,3,4,5].map(v=>`<option value="${v}" ${v==4?'selected':''}>${v} ${GH[v]}</option>`).join('');
+
+document.getElementById('general_health').innerHTML=ghOpt();
+document.getElementById('age_group').innerHTML=opt(AGE,6);
+document.getElementById('education').innerHTML=opt(EDU,4);
+document.getElementById('income').innerHTML=opt(INC,4);
+document.getElementById('employment').innerHTML=opt(EMP,1);
+
+const $=id=>document.getElementById(id);
+const num=id=>+$(id).value;
+const bmi=(kg,cm)=>kg/Math.pow(cm/100,2);
+let model='core6';
+
+$('modelSel').addEventListener('change',e=>{model=e.target.value;$('behavBox').style.display=model==='behav15'?'block':'none';});
+
+function buildPayload(){
+  const c={sleep_hours:num('sleep_hours'),smoking_status:num('smoking_status'),drank_any:num('drank_any'),
+    drinks_per_week:num('drinks_per_week'),exercised:num('exercised'),general_health:num('general_health')};
+  if(model==='core6') return c;
+  return Object.assign(c,{mental_health_days:num('mental_health_days'),physical_health_days:num('physical_health_days'),
+    diff_walking:num('diff_walking'),depression:num('depression'),sex:num('sex'),age_group:num('age_group'),
+    education:num('education'),income:num('income'),employment:num('employment')});
+}
+const riskTag=p=>p<0.35?['tag-g','低風險']:p<0.65?['tag-y','邊界']:['tag-r','高風險'];
+
+async function callApi(pl){
+  const url=API+'/predict/'+model;
+  const c=new AbortController(); const tid=setTimeout(()=>c.abort(),90000);
+  const t0=performance.now();
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl),signal:c.signal});
+  const ms=Math.round(performance.now()-t0);
+  clearTimeout(tid);
+  if(!r.ok){
+    let msg='HTTP '+r.status;
+    try{const e=await r.json(); if(e&&e.detail){ if(Array.isArray(e.detail)){const d=e.detail[0]; msg+='：'+(d.loc?d.loc[d.loc.length-1]+' ':'')+d.msg;} else msg+='：'+e.detail; }}catch(_){}
+    throw new Error(msg);
+  }
+  const j=await r.json();
+  return {prob:j.probability.overweight_obese, raw:j, status:r.status, ms, url};
+}
+// 顯示真實 API 證據（端點 / HTTP 狀態 / 延遲 / 原始 request & response）
+function renderProof(pl,res){
+  const box=$('apiProof'); box.classList.add('show');
+  box.innerHTML=
+    `<b>POST</b> ${res.url}\n`+
+    `<b>狀態</b> <span class="ok">HTTP ${res.status} OK</span>　<b>延遲</b> ${res.ms} ms　<b>時間</b> ${new Date().toLocaleTimeString()}\n`+
+    `<b>送出 (request body)</b>\n${JSON.stringify(pl)}\n`+
+    `<b>後端回應 (raw response)</b>\n${JSON.stringify(res.raw,null,2)}`;
+}
+
+$('runBtn').addEventListener('click',run);
+function setBig(text){
+  const lb=$('loadBig'), span=lb.querySelector('span');
+  $('results').classList.add('show','loading'); lb.classList.add('show');
+  gsap.killTweensOf(span); gsap.set(span,{clearProps:'all'});
+  span.textContent=text;
+  gsap.fromTo(span,{opacity:.5},{opacity:1,duration:.7,repeat:-1,yoyo:true,ease:'sine.inOut'});
+}
+// 中央大字縮小、平移回結果區的小狀態列位置
+function shrinkLoadToStat(text){
+  const lb=$('loadBig'), span=lb.querySelector('span'), small=$('apiStat');
+  gsap.killTweensOf(span); small.textContent=text;
+  const br=span.getBoundingClientRect(), sr=small.getBoundingClientRect();
+  const dx=(sr.left+sr.width/2)-(br.left+br.width/2), dy=(sr.top+sr.height/2)-(br.top+br.height/2);
+  small.style.opacity=0;
+  gsap.to(span,{x:dx,y:dy,scale:0.32,opacity:1,duration:.7,ease:'power3.inOut',onComplete:()=>{
+    lb.classList.remove('show'); $('results').classList.remove('loading'); gsap.set(span,{clearProps:'all'}); small.style.opacity=1;
+  }});
+}
+async function run(){
+  const btn=$('runBtn');
+  // 失焦夾限保險
+  [['sleep_hours',1,24],['weight',20,400],['drinks_per_week',0,140],['height',120,220],['mental_health_days',0,30],['physical_health_days',0,30]]
+    .forEach(([id,lo,hi])=>{let v=+$(id).value; if(isNaN(v))v=lo; $(id).value=Math.max(lo,Math.min(hi,v));});
+  // 收起舊結果，整塊進 Loading，視角移到結果區
+  $('resultwrap').classList.remove('show'); $('sim').classList.remove('show'); $('apiProof').classList.remove('show'); $('apiStat').textContent='';
+  btn.disabled=true; setBig('呼叫 API 中…（冷啟動可能 30–60s）');
+  $('results').scrollIntoView({behavior:'smooth',block:'start'});
+  try{
+    const pl=buildPayload();
+    const t0=Date.now();
+    const res=await callApi(pl);
+    const left=3000-(Date.now()-t0); if(left>0) await new Promise(r=>setTimeout(r,left)); // 至少跑滿 3 秒
+    const p0=res.prob;
+    showResult(p0); drawSim(p0); renderProof(pl,res);   // 填入儀表板、雙曲線、真實 API 證據
+    shrinkLoadToStat('✅ 完成 · 已用你的資料真打 API');  // 大字縮回 → 飛到右上角
+    setTimeout(()=>window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}),150); // 視角移到最底
+  }catch(e){ shrinkLoadToStat('❌ '+e.message); }
+  finally{ btn.disabled=false; }
+}
+
+function showResult(p){
+  const [cl,t]=riskTag(p);
+  $('resultwrap').classList.add('show');
+  const arc=$('gArc'),pct=$('gPct'),o={v:0};
+  gsap.to(o,{v:p*100,duration:1.1,ease:'power2.out',onUpdate:()=>pct.textContent=o.v.toFixed(1)+'%'});
+  arc.style.strokeDashoffset=251.3*(1-p);
+  arc.style.stroke=p<0.35?'#10b981':p<0.65?'#f59e0b':'#ef4444';
+  const w=num('weight'),h=num('height');
+  $('rtxt').innerHTML=`過重+肥胖機率 <span class="tag ${cl}">${(p*100).toFixed(1)}% · ${t}</span><br>目前 BMI <b>${bmi(w,h).toFixed(1)}</b>　模型 <b class="accent">${model==='core6'?'Core_6':'Behav_15'}</b>`;
+}
+
+// 起點真打 p0、體重 w0；之後 16 週本地推趨勢
+function trajectory(p0,w0,dir){
+  const probs=[],bmis=[],h=num('height');
+  const ease=t=>t*t*(3-2*t);
+  const pFloor=Math.max(0.06,p0*0.30), pCeil=Math.min(0.96,p0+(1-p0)*0.85);
+  for(let wk=0;wk<16;wk++){
+    const e=ease(wk/15);
+    if(dir>0){ probs.push(p0+(pCeil-p0)*e); bmis.push(bmi(w0*(1+0.16*e),h)); }   // 惡化
+    else    { probs.push(p0+(pFloor-p0)*e); bmis.push(bmi(w0*(1-0.13*e),h)); }   // 改善
+  }
+  return {probs,bmis};
+}
+
+function drawSim(p0){
+  $('p0lbl').textContent=(p0*100).toFixed(1)+'%';
+  const w0=num('weight');
+  const imp=trajectory(p0,w0,-1), wor=trajectory(p0,w0,1);
+  $('sim').classList.add('show');
+  drawChart($('lcImprove'),imp.probs,imp.bmis);
+  drawChart($('lcWorsen'), wor.probs,wor.bmis);
+}
+
+function drawChart(svg,probs,bmis){
+  const NS='http://www.w3.org/2000/svg'; svg.innerHTML='';
+  const W=480,H=320,padL=44,padR=44,padT=18,padB=34, x0=padL,x1=W-padR,y0=H-padB,y1=padT;
+  const X=wk=>x0+(x1-x0)*(wk/15), Yp=p=>y0+(y1-y0)*p;
+  const bmin=Math.min(...bmis)-1.5,bmax=Math.max(...bmis)+1.5, Yb=b=>y0+(y1-y0)*((b-bmin)/(bmax-bmin));
+  const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+  for(let p=0;p<=1.0001;p+=0.25){svg.appendChild(el('line',{x1:x0,x2:x1,y1:Yp(p),y2:Yp(p),stroke:'#27355a','stroke-dasharray':'4 5'}));
+    const t=el('text',{x:x0-8,y:Yp(p)+4,fill:'#60a5fa','font-size':11,'text-anchor':'end'});t.textContent=(p*100).toFixed(0)+'%';svg.appendChild(t);}
+  for(let i=0;i<=4;i++){const b=bmin+(bmax-bmin)*i/4;const t=el('text',{x:x1+8,y:Yb(b)+4,fill:'#fbbf24','font-size':11});t.textContent=b.toFixed(1);svg.appendChild(t);}
+  if(25>=bmin&&25<=bmax){svg.appendChild(el('line',{x1:x0,x2:x1,y1:Yb(25),y2:Yb(25),stroke:'#ef4444','stroke-dasharray':'6 5','stroke-width':1.5}));
+    const t=el('text',{x:x0+6,y:Yb(25)-5,fill:'#fca5a5','font-size':10});t.textContent='BMI 25';svg.appendChild(t);}
+  [0,5,10,15].forEach(wk=>{const t=el('text',{x:X(wk),y:y0+22,fill:'#90a0c2','font-size':11,'text-anchor':'middle'});t.textContent='W'+(wk+1);svg.appendChild(t);});
+  function line(vals,Yf,color){
+    const pl=el('polyline',{points:vals.map((v,wk)=>X(wk)+','+Yf(v)).join(' '),fill:'none',stroke:color,'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'});
+    svg.appendChild(pl);
+    const len=pl.getTotalLength();pl.style.strokeDasharray=len;pl.style.strokeDashoffset=len;gsap.to(pl.style,{strokeDashoffset:0,duration:1.5,ease:'power2.inOut'});
+    vals.forEach((v,wk)=>{const c=el('circle',{cx:X(wk),cy:Yf(v),r:3,fill:color});c.style.opacity=0;gsap.to(c.style,{opacity:1,duration:.25,delay:.5+wk*0.04});svg.appendChild(c);});
+  }
+  line(probs,Yp,'#60a5fa'); line(bmis,Yb,'#fbbf24');
+}
+
+// 預熱 API（避免 demo 時整段冷啟動）
+fetch(API+'/',{method:'GET'}).catch(()=>{});
+</script>
+</body>
+</html>

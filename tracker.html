@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>16 週生活追蹤試打 · 第五組</title>
+<style>
+  :root{
+    --bg:#0b1120; --bg2:#111a2e; --card:#16213e; --card2:#1b2747; --line:#2a3a63; --ink:#e8eefc; --muted:#90a0c2;
+    --blue:#3b82f6; --blue2:#60a5fa; --green:#10b981; --green2:#34d399; --amber:#f59e0b; --amber2:#fbbf24; --red:#ef4444; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;
+    padding:16px clamp(14px,3vw,38px) 60px; min-height:100vh;}
+  h1{font-size:clamp(19px,2.4vw,28px);} .muted{color:var(--muted);} .sub{color:var(--muted); font-size:13px; margin-top:4px;}
+  .accent{color:var(--blue2);} b{color:#fff;}
+  a.back{color:var(--muted); text-decoration:none; font-size:14px; border:1px solid var(--line); padding:7px 14px; border-radius:9px; display:inline-block;}
+  a.back:hover{color:var(--ink); border-color:var(--blue2);}
+  .topbar{display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:14px; margin:10px 0 16px;}
+  .controls{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;}
+  .ctl label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px;}
+  select,input,.runbtn{font-size:14px; padding:8px 12px; border-radius:9px; border:1px solid var(--line); background:var(--card); color:var(--ink);}
+  select,.runbtn{cursor:pointer;} .runbtn{background:linear-gradient(90deg,var(--violet),var(--blue2)); color:#06122b; font-weight:800; border:none;}
+  .runbtn:disabled{opacity:.5; cursor:default;}
+  .persona{display:flex; gap:14px; flex-wrap:wrap; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:11px 16px; margin-bottom:16px; font-size:13.5px; align-items:center;}
+  .persona .big{font-size:22px;} .persona .kv{color:var(--muted);} .persona .kv b{color:var(--ink);}
+
+  .layout{display:grid; grid-template-columns:1.45fr 1fr; gap:20px; align-items:start;}
+  @media(max-width:900px){.layout{grid-template-columns:1fr;}}
+  .leftcol{display:flex; flex-direction:column; gap:18px; min-width:0;}
+
+  /* QR card（左下） */
+  .qrbox{display:flex; gap:16px; align-items:center; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px;}
+  .qr-card{background:#fff; padding:8px; border-radius:10px; line-height:0; flex:none;}
+  .qr-card img,.qr-card canvas{display:block; width:130px; height:130px;}
+  .qr-cap{font-size:14px; color:var(--muted); line-height:1.7;} .qr-cap b{color:var(--ink);}
+
+  /* calendar */
+  .calbox{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px;}
+  .calhead{display:grid; grid-template-columns:34px repeat(7,1fr); gap:6px; margin-bottom:8px;}
+  .calhead .wd{text-align:center; font-size:12px; color:var(--muted); padding:4px 0;}
+  .calrow{display:grid; grid-template-columns:34px repeat(7,1fr); gap:6px; margin-bottom:6px;}
+  .wlabel{display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:var(--blue2);
+    background:rgba(96,165,250,.08); border:1px solid var(--line); border-radius:8px; cursor:pointer;}
+  .wlabel:hover{border-color:var(--blue2);} .wlabel.wsel{background:var(--blue2); color:#06122b;}
+  .day{position:relative; border:1px solid var(--line); border-radius:9px; padding:7px 6px 16px; cursor:pointer; background:var(--card2);
+    transition:transform .1s, border-color .1s; min-height:50px;}
+  .day:hover{transform:translateY(-1px); border-color:var(--blue2);}
+  .day.sel{border-color:var(--blue2); box-shadow:0 0 0 2px rgba(96,165,250,.4);}
+  .day .dn{font-size:14px; font-weight:700;} .day .dm{font-size:10px; color:var(--muted);}
+  .day .dot{position:absolute; bottom:6px; left:50%; transform:translateX(-50%); width:7px; height:7px; border-radius:50%; background:#3b5070;}
+  .day .dot.g{background:var(--green2);} .day .dot.y{background:var(--amber2);} .day .dot.r{background:#fca5a5;}
+  .calnav{display:flex; justify-content:space-between; margin-bottom:10px;}
+  .calnav button{font-size:13px; padding:6px 14px; border-radius:8px; border:1px solid var(--line); background:var(--card2); color:var(--ink); cursor:pointer;}
+
+  /* panel */
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; position:sticky; top:14px;}
+  .panel .sect-t{font-size:13px; color:var(--muted); margin:14px 0 8px; border-top:1px solid var(--line); padding-top:11px; letter-spacing:.5px;}
+  .panel .sect-t:first-child{border-top:none; padding-top:0; margin-top:0;}
+  .wkavg{display:flex; gap:14px; align-items:center; flex-wrap:wrap;}
+  .gauge{width:150px; height:88px; position:relative; flex:none;}
+  .gauge svg{width:100%; height:100%;} .gauge .pct{position:absolute; bottom:0; left:0; right:0; text-align:center; font-size:23px; font-weight:800;}
+  .avgtxt{font-size:13px; color:var(--muted); line-height:1.7;} .avgtxt b{color:var(--ink);}
+  .form{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+  .form .f label{font-size:11px; color:var(--muted); display:block; margin-bottom:3px;}
+  .form .f input,.form .f select{width:100%;}
+  .btn{padding:10px; border:none; border-radius:10px; cursor:pointer; font-weight:800; font-size:14px; background:var(--blue2); color:#06122b; width:100%; margin-top:10px;}
+  .btn.wk{background:linear-gradient(90deg,var(--violet),var(--blue2));}
+  .btn:disabled{opacity:.5;} .stat{font-size:12.5px; color:var(--muted); text-align:center; margin-top:7px; min-height:16px;}
+  .tag{font-size:11px; padding:2px 8px; border-radius:999px; font-weight:700;}
+  .tag-g{background:#0b3b2e; color:var(--green2);} .tag-y{background:#3b300b; color:var(--amber2);} .tag-r{background:#3b1414; color:#fca5a5;}
+
+  .chart-box{position:relative; margin-top:22px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; display:none;}
+  #runBig{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:5;}
+  #runBig span{font-size:clamp(22px,4vw,42px); font-weight:800; color:#cfe0ff; text-shadow:0 3px 24px rgba(0,0,0,.55); white-space:nowrap;}
+  .chart-box.show{display:block;}
+  .lc-legend{display:flex; gap:18px; flex-wrap:wrap; justify-content:center; margin-top:10px; font-size:13px; color:var(--muted);}
+  .lc-legend span{display:flex; align-items:center; gap:6px;} .lc-legend i{width:18px; height:4px; border-radius:2px;}
+  #runStatus{text-align:center; color:var(--muted); font-size:13px; margin-top:8px; min-height:18px;}
+</style>
+</head>
+<body>
+
+<a class="back" href="presentation.html#16">← 返回簡報（Demo 頁）</a>
+<div class="topbar">
+  <div>
+    <h1>📅 16 週生活追蹤 · 試打 Demo</h1>
+    <div class="sub">點月曆任一天可改當天資料；點左側「W」看整週平均。單天或整週都能送出打 API。</div>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label>情境</label><select id="scenSel"></select></div>
+    <div class="ctl"><label>模型版本</label><select id="modelSel"><option value="core6">Core_6（6 項行為）</option><option value="behav15">Behav_15（15 項）</option></select></div>
+    <div class="ctl"><label>&nbsp;</label><button class="runbtn" id="runAll">▶ 跑全部 16 週 → 雙 Y 軸曲線</button></div>
+  </div>
+</div>
+
+<div class="persona" id="persona"></div>
+
+<div class="layout">
+  <div class="leftcol">
+    <div class="calbox">
+      <div class="calnav"><button id="prevP">← 上 4 週</button><span class="muted" id="pageLbl" style="font-size:13px;align-self:center;"></span><button id="nextP">下 4 週 →</button></div>
+      <div class="calhead" id="calhead"></div>
+      <div id="cal"></div>
+    </div>
+    <div class="qrbox">
+      <div class="qr-card"><div id="qrcode"></div></div>
+      <div class="qr-cap"><b>📱 掃我用手機試打</b><br>同學現在掃 ↑ 填一天 → 看風險與 16 週走勢</div>
+    </div>
+  </div>
+  <div class="panel" id="panel"></div>
+</div>
+
+<div class="chart-box" id="chartBox">
+  <div style="font-size:16px; font-weight:700; margin-bottom:4px;">16 週風險趨勢（雙 Y 軸）</div>
+  <div class="muted" style="font-size:13px; margin-bottom:10px;">左軸＝過重+肥胖機率 ｜ 右軸＝模擬 BMI ｜ 紅虛線＝BMI 25 過重門檻</div>
+  <svg id="lc" viewBox="0 0 960 420" style="width:100%; height:auto;"></svg>
+  <div class="lc-legend"><span><i style="background:#60a5fa"></i>OW+Obese 機率（API）</span><span><i style="background:#fbbf24"></i>模擬 BMI</span></div>
+  <div id="runStatus"></div>
+  <div id="runBig" style="display:none;"><span></span></div>
+</div>
+
+<script src="assets/js/gsap.min.js"></script>
+<script src="assets/js/qrcode.min.js"></script>
+<script>
+const API='https://obesity-api-2-2ro4.onrender.com';
+const IMPROVE=[[5,1,1,20,0,5],[5,1,1,19,0,5],[5.5,1,1,17,0,5],[5.5,2,1,15,0,5],[6,2,1,13,0,4],[6,2,1,11,1,4],[6.5,2,1,9,1,4],[6.5,3,1,7,1,3],[7,3,1,6,1,3],[7,3,1,5,1,3],[7.5,4,1,4,1,2],[7.5,4,1,3,1,2],[8,4,0,2,1,2],[8,4,0,1,1,1],[8,4,0,0,1,1],[8,4,0,0,1,1]];
+const WORSEN=[[8,4,0,0,1,1],[8,4,0,1,1,1],[7.5,4,1,2,1,2],[7.5,4,1,3,1,2],[7,3,1,5,1,2],[7,3,1,7,0,3],[6.5,3,1,9,0,3],[6.5,2,1,11,0,3],[6,2,1,13,0,4],[6,2,1,14,0,4],[5.5,1,1,16,0,4],[5.5,1,1,17,0,5],[5,1,1,18,0,5],[5,1,1,19,0,5],[4.5,1,1,20,0,5],[4.5,1,1,21,0,5]];
+function rep(a){return Array.from({length:16},()=>a.slice());}
+const SCEN={
+  '改善男 💪':{group:'improve',h:178,sex:1,age:6,edu:4,inc:4,emp:1,dw:0,dep:0,c6:IMPROVE,w:[100,99,98,97,95,92.5,90,87.5,84.5,81.5,79,77,75,74,73,71.5]},
+  '改善女 🌸':{group:'improve',h:162,sex:0,age:4,edu:5,inc:5,emp:1,dw:0,dep:0,c6:IMPROVE,w:[74,72.5,71,69.5,68,66.5,65.5,64,63,61.5,60,58.5,57.5,57,56.5,56]},
+  '惡化男 📉':{group:'worsen',h:176,sex:1,age:3,edu:5,inc:4,emp:1,dw:0,dep:0,c6:WORSEN,w:[70,70.5,71,72,73,74,75,76,77,78.5,80,81.5,82.5,83.5,84.5,85.5]},
+  '惡化女 ⚠️':{group:'worsen',h:163,sex:0,age:3,edu:5,inc:4,emp:1,dw:0,dep:0,c6:WORSEN,w:[55,56.5,57.5,58.5,59.5,61,62.5,64,66,68,69.5,70.5,71.5,72,72.5,73]},
+  '穩定健康 ✅':{group:'stable',h:160,sex:0,age:3,edu:6,inc:6,emp:1,dw:0,dep:0,c6:rep([7.5,4,0,0,1,1]),w:Array(16).fill(55)},
+  '穩定高風險 🔴':{group:'stable',h:172,sex:1,age:8,edu:3,inc:2,emp:7,dw:1,dep:1,c6:rep([5,1,1,14,0,5]),w:Array(16).fill(100)},
+};
+const bmi=(kg,cm)=>kg/Math.pow(cm/100,2);
+const r1=x=>Math.round(x*10)/10;
+const START=new Date(2026,5,1);
+const dayDate=i=>{const d=new Date(START);d.setDate(d.getDate()+i);return d;};
+const SMOKE={1:'每日',2:'偶爾',3:'已戒',4:'從未'}, GH={1:'非常好',2:'很好',3:'普通',4:'不太好',5:'很差'};
+const EDU={1:'未受教育',2:'小學',3:'國高中',4:'高中畢業',5:'專科/大學肄業',6:'大學以上'};
+const INC={1:'<$15k',2:'$15–25k',3:'$25–35k',4:'$35–50k',5:'$50–100k',6:'$100–150k',7:'$150–200k',8:'≥$200k'};
+const AGE={1:'18–24',2:'25–29',3:'30–34',4:'35–39',5:'40–44',6:'45–49',7:'50–54',8:'55–59',9:'60–64',10:'65–69',11:'70–74',12:'75–79',13:'80+'};
+const opts=m=>Object.entries(m).map(([v,t])=>`<option value="${v}">${v} · ${t}</option>`).join('');
+// 每日數值輸入的合法範圍（對齊 API 驗證，避免 422）
+const DCLAMP={weight:[20,400], sleep_hours:[1,24], drinks_per_week:[0,140]};
+
+let curKey, model='core6', selIdx=0, page=0;
+let state={days:[], stat:{}, dayRisk:{}};
+
+function buildDays(sc){const days=[];for(let wk=0;wk<16;wk++){const w0=sc.w[wk],w1=sc.w[Math.min(wk+1,15)],b=sc.c6[wk];for(let d=0;d<7;d++){days.push({wk,idx:wk*7+d,weight:r1(w0+(w1-w0)*(d/7)),sleep_hours:b[0],smoking_status:b[1],drank_any:b[2],drinks_per_week:b[3],exercised:b[4],general_health:b[5]});}}return days;}
+function loadScenario(){const sc=SCEN[curKey];state.days=buildDays(sc);state.dayRisk={};state.stat={sex:sc.sex,age_group:sc.age,education:sc.edu,income:sc.inc,employment:sc.emp,diff_walking:sc.dw,depression:sc.dep,mental_health_days:0,physical_health_days:0};}
+
+const wkDays=wk=>state.days.slice(wk*7,wk*7+7);
+const avg=(arr,k)=>arr.reduce((s,d)=>s+(+d[k]),0)/arr.length;
+function weekCore(wk){const ds=wkDays(wk);return {sleep_hours:r1(avg(ds,'sleep_hours')),smoking_status:Math.round(avg(ds,'smoking_status')),drank_any:Math.round(avg(ds,'drank_any')),drinks_per_week:r1(avg(ds,'drinks_per_week')),exercised:Math.round(avg(ds,'exercised')),general_health:Math.round(avg(ds,'general_health'))};}
+const withStatic=c=>Object.assign({},c,state.stat);
+const weekPayload=wk=>{const c=weekCore(wk);return model==='core6'?c:withStatic(c);};
+function dayPayload(d){const c={sleep_hours:+d.sleep_hours,smoking_status:+d.smoking_status,drank_any:+d.drank_any,drinks_per_week:+d.drinks_per_week,exercised:+d.exercised,general_health:+d.general_health};return model==='core6'?c:withStatic(c);}
+const riskTag=p=>p<0.35?['tag-g','低','g']:p<0.65?['tag-y','邊界','y']:['tag-r','高','r'];
+
+const scenSel=document.getElementById('scenSel');
+Object.keys(SCEN).forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=k;scenSel.appendChild(o);});
+scenSel.addEventListener('change',()=>{curKey=scenSel.value;loadScenario();selIdx=0;page=0;render();});
+document.getElementById('modelSel').addEventListener('change',e=>{model=e.target.value;render();});
+document.getElementById('prevP').addEventListener('click',()=>{if(page>0){page--;render();}});
+document.getElementById('nextP').addEventListener('click',()=>{if(page<3){page++;render();}});
+
+function render(){
+  const sc=SCEN[curKey];
+  const b0=bmi(sc.w[0],sc.h).toFixed(1), bE=bmi(sc.w[15],sc.h).toFixed(1);
+  const statTxt=model==='behav15'
+    ?`<span class="kv">性別 <b>${state.stat.sex?'男':'女'}</b></span><span class="kv">年齡 <b>${AGE[state.stat.age_group]||state.stat.age_group}</b></span><span class="kv">教育 <b>${EDU[state.stat.education]||state.stat.education}</b></span><span class="kv">收入 <b>${INC[state.stat.income]||state.stat.income}</b></span><span class="kv">行走困難 <b>${state.stat.diff_walking?'是':'否'}</b></span><span class="kv">憂鬱 <b>${state.stat.depression?'是':'否'}</b></span>`
+    :`<span class="kv muted">（Core_6 只用 6 項行為，不含人口統計）</span>`;
+  document.getElementById('persona').innerHTML=`<span class="big">${(curKey.split(' ')[1]||'')}</span><span class="kv">情境 <b>${curKey}</b></span><span class="kv">身高 <b>${sc.h}cm</b></span><span class="kv">BMI <b>${b0}→${bE}</b></span><span class="kv">模型 <b class="accent">${model==='core6'?'Core_6（6維）':'Behav_15（15維）'}</b></span> ${statTxt}`;
+
+  document.getElementById('calhead').innerHTML=`<div class="wd"></div>`+['一','二','三','四','五','六','日'].map(w=>`<div class="wd">${w}</div>`).join('');
+  const selWk=Math.floor(selIdx/7);
+  let cal='';
+  for(let wk=page*4; wk<page*4+4 && wk<16; wk++){
+    let cells=`<div class="wlabel ${wk===selWk?'wsel':''}" data-wk="${wk}">W${wk+1}</div>`;
+    for(let d=0;d<7;d++){
+      const idx=wk*7+d, dt=dayDate(idx), risk=state.dayRisk[idx];
+      const dotc=risk?riskTag(risk)[2]:'';
+      cells+=`<div class="day ${idx===selIdx?'sel':''}" data-idx="${idx}"><div class="dn">${dt.getDate()}</div><div class="dm">${dt.getMonth()+1}月</div><div class="dot ${dotc}"></div></div>`;
+    }
+    cal+=`<div class="calrow">${cells}</div>`;
+  }
+  document.getElementById('cal').innerHTML=cal;
+  document.getElementById('pageLbl').textContent=`第 ${page*4+1}–${Math.min(page*4+4,16)} 週`;
+  document.querySelectorAll('.day').forEach(el=>el.addEventListener('click',()=>{selIdx=+el.dataset.idx;render();}));
+  document.querySelectorAll('.wlabel').forEach(el=>el.addEventListener('click',()=>{selIdx=(+el.dataset.wk)*7;render();}));
+  renderPanel();
+  document.getElementById('chartBox').classList.remove('show');
+}
+
+function renderPanel(){
+  const sc=SCEN[curKey], wk=Math.floor(selIdx/7), c=weekCore(wk), ds=wkDays(wk), w=avg(ds,'weight'), bm=bmi(w,sc.h);
+  const d=state.days[selIdx], dt=dayDate(selIdx);
+  const staticSect=model==='behav15'?`
+    <div class="sect-t">靜態資料（整週共用）</div>
+    <div class="form">
+      <div class="f"><label>性別</label><select data-st="sex"><option value="1">男</option><option value="0">女</option></select></div>
+      <div class="f"><label>年齡組</label><select data-st="age_group">${opts(AGE)}</select></div>
+      <div class="f"><label>教育程度</label><select data-st="education">${opts(EDU)}</select></div>
+      <div class="f"><label>家庭年收入</label><select data-st="income">${opts(INC)}</select></div>
+      <div class="f"><label>行走困難</label><select data-st="diff_walking"><option value="0">否</option><option value="1">是</option></select></div>
+      <div class="f"><label>憂鬱</label><select data-st="depression"><option value="0">否</option><option value="1">是</option></select></div>
+    </div>`:'';
+  document.getElementById('panel').innerHTML=`
+    <div class="sect-t">📊 Week ${wk+1} 平均（整週送出值）</div>
+    <div class="wkavg">
+      <div class="gauge"><svg viewBox="0 0 200 110"><path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#27355a" stroke-width="16" stroke-linecap="round"/><path id="wArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--blue2)" stroke-width="16" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition:stroke-dashoffset 1s,stroke .4s;"/></svg><div class="pct" id="wPct">--%</div></div>
+      <div class="avgtxt">體重 <b>${w.toFixed(1)}kg</b> ｜ BMI <b>${bm.toFixed(1)}</b><br>睡眠 <b>${c.sleep_hours}h</b> ｜ 吸菸 <b>${SMOKE[c.smoking_status]}</b><br>週飲酒 <b>${c.drinks_per_week}</b> ｜ 運動 <b>${c.exercised?'有':'無'}</b><br>自評 <b>${c.general_health} ${GH[c.general_health]}</b></div>
+    </div>
+    <button class="btn wk" id="wSend">▶ 送出整週打 API</button><div class="stat" id="wStat"></div>
+    ${staticSect}
+    <div class="sect-t">✏️ ${dt.getMonth()+1}/${dt.getDate()}（第 ${wk+1} 週）每日記錄</div>
+    <div class="form">
+      <div class="f"><label>體重 kg (20–400)</label><input type="number" step="0.1" min="20" max="400" data-k="weight" value="${d.weight}"></div>
+      <div class="f"><label>睡眠 h (1–24)</label><input type="number" step="0.5" min="1" max="24" data-k="sleep_hours" value="${d.sleep_hours}"></div>
+      <div class="f"><label>吸菸</label><select data-k="smoking_status">${[4,3,2,1].map(v=>`<option value="${v}" ${v==d.smoking_status?'selected':''}>${SMOKE[v]}</option>`).join('')}</select></div>
+      <div class="f"><label>飲酒</label><select data-k="drank_any"><option value="0" ${d.drank_any==0?'selected':''}>無</option><option value="1" ${d.drank_any==1?'selected':''}>有</option></select></div>
+      <div class="f"><label>週飲酒杯數 (0–140)</label><input type="number" step="1" min="0" max="140" data-k="drinks_per_week" value="${d.drinks_per_week}"></div>
+      <div class="f"><label>運動</label><select data-k="exercised"><option value="1" ${d.exercised==1?'selected':''}>有</option><option value="0" ${d.exercised==0?'selected':''}>無</option></select></div>
+      <div class="f" style="grid-column:1/3;"><label>自評健康</label><select data-k="general_health">${[1,2,3,4,5].map(v=>`<option value="${v}" ${v==d.general_health?'selected':''}>${v} ${GH[v]}</option>`).join('')}</select></div>
+    </div>
+    <button class="btn" id="dSend">▶ 送出這天打 API</button><div class="stat" id="dStat"></div>`;
+
+  document.querySelectorAll('[data-st]').forEach(el=>{el.value=state.stat[el.dataset.st];el.addEventListener('change',()=>{state.stat[el.dataset.st]=+el.value;render();});});
+  document.querySelectorAll('[data-k]').forEach(el=>{
+    const key=el.dataset.k;
+    if(el.tagName==='SELECT'){
+      el.addEventListener('change',()=>{state.days[selIdx][key]=+el.value;renderPanel();});
+    }else{
+      // input：每打一字只更新狀態，不重繪 → 可連續輸入不跳掉
+      el.addEventListener('input',()=>{state.days[selIdx][key]=+el.value;});
+      // change（失焦/Enter）：夾限到合法範圍，再重繪整週平均
+      el.addEventListener('change',()=>{
+        let v=+el.value; const c=DCLAMP[key];
+        if(c){ if(isNaN(v)) v=c[0]; v=Math.max(c[0],Math.min(c[1],v)); el.value=v; }
+        state.days[selIdx][key]=v; renderPanel();
+      });
+    }
+  });
+  document.getElementById('wSend').addEventListener('click',()=>submit('wk',wk,'wArc','wPct','wStat'));
+  document.getElementById('dSend').addEventListener('click',()=>submit('day',selIdx,null,null,'dStat'));
+}
+
+async function submit(kind,id,arcId,pctId,statId){
+  const stat=document.getElementById(statId), btn=stat.previousElementSibling; btn.disabled=true; stat.textContent='呼叫中…（冷啟動 30-60s）';
+  const pl=kind==='wk'?weekPayload(id):dayPayload(state.days[id]);
+  try{
+    const p=await callApi(model,pl); const[cl,t,dc]=riskTag(p);
+    if(arcId){const arc=document.getElementById(arcId),pct=document.getElementById(pctId),o={v:0};gsap.to(o,{v:p*100,duration:1,ease:'power2.out',onUpdate:()=>pct.textContent=o.v.toFixed(1)+'%'});arc.style.strokeDashoffset=251.3*(1-p);arc.style.stroke=p<0.35?'#10b981':p<0.65?'#f59e0b':'#ef4444';}
+    stat.innerHTML=`<span class="tag ${cl}">${(p*100).toFixed(1)}% · ${t}</span>`;
+    if(kind==='day'){ state.dayRisk[id]=p; const cell=document.querySelector(`.day[data-idx="${id}"] .dot`); if(cell)cell.className='dot '+dc; }
+  }catch(e){ stat.textContent='❌ '+e.message; } finally{ btn.disabled=false; }
+}
+async function callApi(model,pl){
+  const c=new AbortController(); const tid=setTimeout(()=>c.abort(),90000);
+  const r=await fetch(API+'/predict/'+model,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(pl),signal:c.signal});
+  clearTimeout(tid);
+  if(!r.ok){
+    let msg='HTTP '+r.status;
+    try{const e=await r.json(); if(e&&e.detail){ if(Array.isArray(e.detail)){const d=e.detail[0]; msg+='：'+(d.loc?d.loc[d.loc.length-1]+' ':'')+d.msg;} else msg+='：'+e.detail; }}catch(_){}
+    throw new Error(msg);
+  }
+  const j=await r.json(); return j.probability.overweight_obese;
+}
+
+document.getElementById('runAll').addEventListener('click',runAll);
+// 把置中大字縮小、平移回原本的小狀態列位置
+function shrinkBigToStatus(text){
+  const big=document.getElementById('runBig'), span=big.firstElementChild, small=document.getElementById('runStatus');
+  small.textContent=text;
+  const br=span.getBoundingClientRect(), sr=small.getBoundingClientRect();
+  const dx=(sr.left+sr.width/2)-(br.left+br.width/2), dy=(sr.top+sr.height/2)-(br.top+br.height/2);
+  small.style.opacity=0;
+  gsap.to(span,{x:dx,y:dy,scale:0.34,duration:.75,ease:'power3.inOut',onComplete:()=>{
+    big.style.display='none'; gsap.set(span,{clearProps:'all'}); small.style.opacity=1;
+  }});
+}
+function setBig(text){const big=document.getElementById('runBig'),span=big.firstElementChild;big.style.display='flex';gsap.set(span,{clearProps:'all'});span.textContent=text;}
+async function runAll(){
+  const sc=SCEN[curKey], btn=document.getElementById('runAll'), box=document.getElementById('chartBox');
+  box.classList.add('show'); box.scrollIntoView({behavior:'smooth'});
+  const st=document.getElementById('runStatus'); st.textContent=''; btn.disabled=true;
+  const probs=[], bmis=[]; for(let wk=0;wk<16;wk++) bmis.push(bmi(avg(wkDays(wk),'weight'),sc.h));
+  for(let wk=0;wk<16;wk++){ setBig(`打 API 中… Week ${wk+1} / 16`);
+    try{ probs.push(await callApi(model,weekPayload(wk))); }catch(e){ shrinkBigToStatus('❌ Week '+(wk+1)+'：'+e.message); btn.disabled=false; return; } }
+  shrinkBigToStatus('✅ 16 週完成'); btn.disabled=false; drawChart(probs,bmis);
+}
+function drawChart(probs,bmis){
+  const svg=document.getElementById('lc'); const NS='http://www.w3.org/2000/svg'; svg.innerHTML='';
+  const W=960,H=420,padL=58,padR=58,padT=24,padB=46, x0=padL,x1=W-padR,y0=H-padB,y1=padT;
+  const X=wk=>x0+(x1-x0)*(wk/15), Yp=p=>y0+(y1-y0)*p;
+  const bmin=Math.min(...bmis)-1.5,bmax=Math.max(...bmis)+1.5, Yb=b=>y0+(y1-y0)*((b-bmin)/(bmax-bmin));
+  for(let p=0;p<=1.0001;p+=0.2){const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',x0);ln.setAttribute('x2',x1);ln.setAttribute('y1',Yp(p));ln.setAttribute('y2',Yp(p));ln.setAttribute('stroke','#27355a');ln.setAttribute('stroke-dasharray','4 5');svg.appendChild(ln);
+    const t=document.createElementNS(NS,'text');t.setAttribute('x',x0-10);t.setAttribute('y',Yp(p)+4);t.setAttribute('fill','#60a5fa');t.setAttribute('font-size','12');t.setAttribute('text-anchor','end');t.textContent=(p*100).toFixed(0)+'%';svg.appendChild(t);}
+  for(let i=0;i<=4;i++){const b=bmin+(bmax-bmin)*i/4;const t=document.createElementNS(NS,'text');t.setAttribute('x',x1+10);t.setAttribute('y',Yb(b)+4);t.setAttribute('fill','#fbbf24');t.setAttribute('font-size','12');t.textContent=b.toFixed(1);svg.appendChild(t);}
+  if(25>=bmin&&25<=bmax){const ln=document.createElementNS(NS,'line');ln.setAttribute('x1',x0);ln.setAttribute('x2',x1);ln.setAttribute('y1',Yb(25));ln.setAttribute('y2',Yb(25));ln.setAttribute('stroke','#ef4444');ln.setAttribute('stroke-dasharray','6 5');ln.setAttribute('stroke-width','1.5');svg.appendChild(ln);
+    const t=document.createElementNS(NS,'text');t.setAttribute('x',x0+6);t.setAttribute('y',Yb(25)-6);t.setAttribute('fill','#fca5a5');t.setAttribute('font-size','11');t.textContent='BMI 25 過重門檻';svg.appendChild(t);}
+  [0,3,7,11,15].forEach(wk=>{const t=document.createElementNS(NS,'text');t.setAttribute('x',X(wk));t.setAttribute('y',y0+24);t.setAttribute('fill','#90a0c2');t.setAttribute('font-size','12');t.setAttribute('text-anchor','middle');t.textContent='W'+(wk+1);svg.appendChild(t);});
+  function line(vals,Yf,color){const pts=vals.map((v,wk)=>X(wk)+','+Yf(v)).join(' ');const pl=document.createElementNS(NS,'polyline');pl.setAttribute('points',pts);pl.setAttribute('fill','none');pl.setAttribute('stroke',color);pl.setAttribute('stroke-width','3.5');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('stroke-linecap','round');svg.appendChild(pl);
+    const len=pl.getTotalLength();pl.style.strokeDasharray=len;pl.style.strokeDashoffset=len;gsap.to(pl.style,{strokeDashoffset:0,duration:1.6,ease:'power2.inOut'});
+    vals.forEach((v,wk)=>{const c=document.createElementNS(NS,'circle');c.setAttribute('cx',X(wk));c.setAttribute('cy',Yf(v));c.setAttribute('r','3.5');c.setAttribute('fill',color);c.style.opacity=0;gsap.to(c.style,{opacity:1,duration:.25,delay:.6+wk*0.05});svg.appendChild(c);});}
+  line(probs,Yp,'#60a5fa'); line(bmis,Yb,'#fbbf24');
+}
+
+curKey=Object.keys(SCEN)[0]; scenSel.value=curKey; loadScenario();
+fetch(API+'/',{method:'GET'}).catch(()=>{});
+render();
+
+// 左下 QR → 指向同學掃的「單日快速試打」頁
+const QR_URL='https://inorino.github.io/obesity-demo/demo_single.html';
+try{ new QRCode(document.getElementById('qrcode'),{text:QR_URL,width:130,height:130,colorDark:'#0b1120',colorLight:'#ffffff'}); }catch(e){}
+</script>
+</body>
+</html>

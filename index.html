@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>肥胖風險預測 Demo · 第五組</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif; background: #f3f4f6; color: #111827; }
+  body { padding: 16px 12px 60px; max-width: 480px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 18px; }
+  header h1 { font-size: 22px; margin: 0 0 4px; color: #1e3a8a; }
+  header p { font-size: 13px; margin: 0; color: #6b7280; }
+  .card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 14px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: #e5e7eb; cursor: pointer; font-size: 14px; font-weight: 600; color: #4b5563; border: 2px solid transparent; }
+  .tab.active { background: #2563eb; color: #fff; border-color: #1d4ed8; }
+  .tab .badge { display: block; font-size: 11px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin: 12px 0 4px; }
+  label .hint { font-weight: 400; color: #9ca3af; font-size: 11px; margin-left: 4px; }
+  input, select { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; -webkit-appearance: none; appearance: none; }
+  select { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8L0 0h12z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
+  input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .submit { width: 100%; padding: 14px; font-size: 16px; font-weight: 700; color: #fff; background: #2563eb; border: none; border-radius: 10px; cursor: pointer; margin-top: 18px; }
+  .submit:active { background: #1e40af; }
+  .submit:disabled { background: #9ca3af; }
+  .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 12px; font-size: 12px; color: #78350f; border-radius: 6px; margin-bottom: 14px; line-height: 1.5; }
+  .result { display: none; text-align: center; padding: 24px 16px; }
+  .result.show { display: block; }
+  .gauge { width: 200px; height: 110px; margin: 0 auto 12px; position: relative; }
+  .gauge svg { width: 100%; height: 100%; }
+  .gauge .pct { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 30px; font-weight: 800; }
+  .label-tag { display: inline-block; padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 700; margin: 8px 0; }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-yellow { background: #fef3c7; color: #92400e; }
+  .tag-red { background: #fee2e2; color: #991b1b; }
+  .result-detail { font-size: 13px; color: #4b5563; margin-top: 8px; line-height: 1.6; }
+  .footer { text-align: center; font-size: 11px; color: #9ca3af; margin-top: 18px; line-height: 1.6; }
+  .loading { display: none; text-align: center; padding: 30px; }
+  .loading.show { display: block; }
+  .spinner { display: inline-block; width: 36px; height: 36px; border: 4px solid #e5e7eb; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { display: none; background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; font-size: 13px; margin-top: 10px; }
+  .error.show { display: block; }
+  .reset { background: transparent; color: #2563eb; border: 1px solid #2563eb; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 16px; }
+  .feature-set { font-size: 11px; color: #6b7280; text-align: center; margin-top: -8px; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🫀 肥胖風險預測 Demo</h1>
+  <p>機器學習期末專案 · 第五組 · BRFSS 2022 (n=329k)</p>
+</header>
+
+<div class="warning">
+  ⚠️ 首次使用 API 可能需 <b>30–60 秒</b> 喚醒（Render 免費方案 cold start）
+</div>
+
+<div class="card">
+  <div class="tabs">
+    <div class="tab active" data-mode="core6">
+      簡易版
+      <span class="badge">6 項 · F1=0.608</span>
+    </div>
+    <div class="tab" data-mode="behav15">
+      完整版
+      <span class="badge">15 項 · F1=0.680</span>
+    </div>
+  </div>
+
+  <form id="predictForm">
+    <!-- Core_6 fields (always shown) -->
+    <label>每日睡眠時數 <span class="hint">小時 (1–24)</span></label>
+    <input type="number" name="sleep_hours" value="7" min="1" max="24" step="0.5" required>
+
+    <label>吸菸狀態</label>
+    <select name="smoking_status" required>
+      <option value="4" selected>從未吸菸</option>
+      <option value="3">已戒菸</option>
+      <option value="2">偶爾吸菸</option>
+      <option value="1">每日吸菸</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label>過去 30 天<br>有飲酒？</label>
+        <select name="drank_any" id="drank_any" required>
+          <option value="0" selected>沒有</option>
+          <option value="1">有</option>
+        </select>
+      </div>
+      <div>
+        <label>每週飲酒杯數 <span class="hint">≥0</span></label>
+        <input type="number" name="drinks_per_week" value="0" min="0" max="100" step="0.5" required>
+      </div>
+    </div>
+
+    <label>過去 30 天有運動？</label>
+    <select name="exercised" required>
+      <option value="1" selected>有</option>
+      <option value="0">沒有</option>
+    </select>
+
+    <label>自評整體健康狀況 <span class="hint">1=最好, 5=最差</span></label>
+    <select name="general_health" required>
+      <option value="1">1 · 非常好</option>
+      <option value="2" selected>2 · 很好</option>
+      <option value="3">3 · 普通</option>
+      <option value="4">4 · 不太好</option>
+      <option value="5">5 · 差</option>
+    </select>
+
+    <!-- Behav_15 extra fields -->
+    <div id="behavExtra" style="display:none;">
+      <hr style="border:none;border-top:1px dashed #d1d5db;margin:18px 0;">
+      <div class="feature-set">↓ 完整版額外欄位（人口統計與心理健康）</div>
+
+      <div class="row">
+        <div>
+          <label>性別</label>
+          <select name="sex">
+            <option value="1" selected>男</option>
+            <option value="0">女</option>
+          </select>
+        </div>
+        <div>
+          <label>年齡組</label>
+          <select name="age_group">
+            <option value="1">18–24</option>
+            <option value="2">25–29</option>
+            <option value="3">30–34</option>
+            <option value="4">35–39</option>
+            <option value="5">40–44</option>
+            <option value="6" selected>45–49</option>
+            <option value="7">50–54</option>
+            <option value="8">55–59</option>
+            <option value="9">60–64</option>
+            <option value="10">65–69</option>
+            <option value="11">70–74</option>
+            <option value="12">75–79</option>
+            <option value="13">80+</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>過去 30 天<br>心理不適天數</label>
+          <input type="number" name="mental_health_days" value="0" min="0" max="30">
+        </div>
+        <div>
+          <label>過去 30 天<br>身體不適天數</label>
+          <input type="number" name="physical_health_days" value="0" min="0" max="30">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>行走困難？</label>
+          <select name="diff_walking">
+            <option value="0" selected>沒有</option>
+            <option value="1">有</option>
+          </select>
+        </div>
+        <div>
+          <label>曾診斷憂鬱症？</label>
+          <select name="depression">
+            <option value="0" selected>沒有</option>
+            <option value="1">有</option>
+          </select>
+        </div>
+      </div>
+
+      <label>教育程度</label>
+      <select name="education">
+        <option value="1">未受教育</option>
+        <option value="2">小學</option>
+        <option value="3">國中</option>
+        <option value="4">高中</option>
+        <option value="5">大專</option>
+        <option value="6" selected>大學或以上</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label>收入級距</label>
+          <select name="income">
+            <option value="1">&lt;$10K</option>
+            <option value="2">$10–15K</option>
+            <option value="3">$15–20K</option>
+            <option value="4">$20–25K</option>
+            <option value="5">$25–35K</option>
+            <option value="6">$35–50K</option>
+            <option value="7" selected>$50–75K</option>
+            <option value="8">$75K+</option>
+          </select>
+        </div>
+        <div>
+          <label>就業狀態</label>
+          <select name="employment">
+            <option value="1" selected>受雇</option>
+            <option value="2">自雇</option>
+            <option value="3">失業 ≥1 年</option>
+            <option value="4">失業 &lt;1 年</option>
+            <option value="5">家管</option>
+            <option value="6">學生</option>
+            <option value="7">退休</option>
+            <option value="8">無法工作</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="submit" id="submitBtn">🔮 預測我的肥胖風險</button>
+    <div class="error" id="errorBox"></div>
+  </form>
+</div>
+
+<div class="card loading" id="loadingBox">
+  <div class="spinner"></div>
+  <p style="font-size:13px;color:#6b7280;margin:10px 0 0;">呼叫 API 中... 若 API 在睡眠中需 30–60 秒喚醒</p>
+</div>
+
+<div class="card result" id="resultBox">
+  <div style="font-size:13px;color:#6b7280;">過重 + 肥胖機率</div>
+  <div class="gauge">
+    <svg viewBox="0 0 200 110">
+      <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e5e7eb" stroke-width="16" stroke-linecap="round"/>
+      <path id="gaugeArc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#2563eb" stroke-width="16" stroke-linecap="round" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition: stroke-dashoffset 1s ease, stroke 0.5s;"/>
+    </svg>
+    <div class="pct" id="pctText">--%</div>
+  </div>
+  <div id="labelTag" class="label-tag tag-green">Normal</div>
+  <div class="result-detail" id="resultDetail"></div>
+  <button class="reset" onclick="resetForm()">再試一次</button>
+</div>
+
+<div class="footer">
+  Model: XGBoost + SMOTE · Data: CDC BRFSS 2022 (n=329,126)<br>
+  Endpoints: <code>obesity-api-2-2ro4.onrender.com</code><br>
+  © 2026 第五組 · 14773008 賴百擎 · 11773037 陳宗傑
+</div>
+
+<script>
+const API_BASE = 'https://obesity-api-2-2ro4.onrender.com';
+let currentMode = 'core6';
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentMode = t.dataset.mode;
+    document.getElementById('behavExtra').style.display = currentMode === 'behav15' ? 'block' : 'none';
+  });
+});
+
+document.getElementById('predictForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const data = {};
+  const coreFields = ['sleep_hours','smoking_status','drank_any','drinks_per_week','exercised','general_health'];
+  const extraFields = ['mental_health_days','physical_health_days','diff_walking','depression','sex','age_group','education','income','employment'];
+  const fields = currentMode === 'core6' ? coreFields : coreFields.concat(extraFields);
+  fields.forEach(f => {
+    const v = form.elements[f].value;
+    data[f] = f.includes('hours') || f.includes('week') ? parseFloat(v) : parseInt(v);
+  });
+
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('resultBox').classList.remove('show');
+  document.getElementById('loadingBox').classList.add('show');
+  document.getElementById('submitBtn').disabled = true;
+
+  try {
+    const endpoint = currentMode === 'core6' ? '/predict/core6' : '/predict/behav15';
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 90000);
+    const resp = await fetch(API_BASE + endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      signal: ctrl.signal
+    });
+    clearTimeout(tid);
+    if (!resp.ok) throw new Error('API error: ' + resp.status);
+    const result = await resp.json();
+    showResult(result);
+  } catch (err) {
+    document.getElementById('errorBox').textContent = '❌ 預測失敗：' + err.message + '（請稍候重試）';
+    document.getElementById('errorBox').classList.add('show');
+  } finally {
+    document.getElementById('loadingBox').classList.remove('show');
+    document.getElementById('submitBtn').disabled = false;
+  }
+});
+
+function showResult(r) {
+  const p = r.probability.overweight_obese;
+  const pct = (p * 100).toFixed(1);
+  document.getElementById('pctText').textContent = pct + '%';
+  const circ = 251.3;
+  document.getElementById('gaugeArc').style.strokeDashoffset = circ * (1 - p);
+  let color, tagClass, advice;
+  if (p < 0.35) { color = '#10b981'; tagClass = 'tag-green'; advice = '目前肥胖風險低，建議維持現有生活型態。'; }
+  else if (p < 0.65) { color = '#f59e0b'; tagClass = 'tag-yellow'; advice = '處於風險邊界，建議檢視睡眠、運動與飲酒習慣。'; }
+  else { color = '#ef4444'; tagClass = 'tag-red'; advice = '風險偏高，建議改善行為（規律睡眠、增加運動、減少飲酒）。'; }
+  document.getElementById('gaugeArc').style.stroke = color;
+  const tag = document.getElementById('labelTag');
+  tag.textContent = r.label;
+  tag.className = 'label-tag ' + tagClass;
+  document.getElementById('resultDetail').innerHTML =
+    '<b>模型判斷：</b>' + (r.prediction === 1 ? 'Overweight + Obese' : 'Normal') +
+    '<br><b>使用特徵集：</b>' + (currentMode === 'core6' ? 'Core_6（6 項行為）' : 'Behav_15（15 項行為 + 人口統計）') +
+    '<br><br>' + advice;
+  document.getElementById('resultBox').classList.add('show');
+  document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  document.getElementById('resultBox').classList.remove('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Warm up the API silently on page load
+fetch(API_BASE + '/', { method: 'GET' }).catch(() => {});
+</script>
+</body>
+</html>

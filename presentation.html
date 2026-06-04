@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>結合生活指標與行為趨勢之肥胖風險預測模型 · 第五組</title>
+<style>
+  :root{
+    --bg:#0b1120; --bg2:#111a2e; --card:#16213e; --card2:#1b2747;
+    --ink:#e8eefc; --muted:#90a0c2; --line:#2a3a63;
+    --blue:#3b82f6; --blue2:#60a5fa; --green:#10b981; --green2:#34d399;
+    --amber:#f59e0b; --amber2:#fbbf24; --red:#ef4444; --violet:#a78bfa; --pink:#f472b6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%; background:var(--bg); color:var(--ink); overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft JhengHei",sans-serif;}
+
+  .slide{position:fixed; inset:0; display:flex; flex-direction:column; justify-content:center;
+    align-items:center; padding:7vh 7vw 9vh; opacity:0; visibility:hidden; pointer-events:none;
+    background:radial-gradient(1300px 760px at 50% -5%, var(--bg2), var(--bg) 72%);}
+  .slide.active{opacity:1; visibility:visible; pointer-events:auto;}
+
+  /* split (content + side photo) */
+  .slide.split{flex-direction:row; padding:0; align-items:stretch; justify-content:flex-start;}
+  .col-main{flex:1; display:flex; flex-direction:column; justify-content:center; padding:7vh 4.2vw; min-width:0;}
+  .col-photo{width:37vw; flex:none; position:relative; overflow:hidden;}
+  .col-photo img{width:100%; height:100%; object-fit:cover; object-position:center;}
+  .col-photo::after{content:''; position:absolute; inset:0;
+    background:linear-gradient(90deg, var(--bg) 0%, rgba(11,17,32,.5) 11%, rgba(11,17,32,.05) 32%, transparent 55%);}
+  .split .col-main h2, .split .col-main .head{text-align:left;}
+  .split .col-main .lead{text-align:left; margin-left:0;}
+  .split .grid{width:100%;}
+  .split .chart{height:28vh;}
+
+  h1{font-size:clamp(28px,4.6vw,58px); line-height:1.15; letter-spacing:-.5px; text-align:center;}
+  h2{font-size:clamp(20px,2.9vw,36px); line-height:1.18; text-align:center;}
+  h2 .k{color:var(--blue2);}
+  .lead{color:var(--muted); font-size:clamp(13px,1.55vw,19px); text-align:center; margin-top:.5em; max-width:1000px;}
+  .sub{color:var(--muted); font-size:clamp(13px,1.5vw,18px); text-align:center;}
+  .accent{color:var(--blue2);} .em-green{color:var(--green2);} .em-amber{color:var(--amber2);}
+  .em-red{color:var(--red);} .em-violet{color:var(--violet);}
+  b{color:#fff;}
+  .head{margin-bottom:2.6vh;}
+
+  .chrome{position:fixed; z-index:50; font-size:12px; color:var(--muted); letter-spacing:.5px;}
+  .chrome.tl{top:18px; left:26px;} .chrome.br{bottom:15px; right:26px; font-variant-numeric:tabular-nums;}
+  .progress{position:fixed; top:0; left:0; height:3px; width:0%; z-index:60;
+    background:linear-gradient(90deg,var(--blue),var(--violet)); transition:width .45s ease;}
+  .hint{position:fixed; bottom:14px; left:26px; z-index:50; color:#33436e; font-size:11px;}
+
+  .grid{display:grid; gap:16px; width:min(1120px,90vw);}
+  .g1{grid-template-columns:1fr;} .g2{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(3,1fr);} .g4{grid-template-columns:repeat(4,1fr);}
+  .card-i{background:var(--card); border:1px solid var(--line); border-radius:15px; padding:16px 20px;}
+  .card-i .t{font-size:clamp(14px,1.6vw,20px); font-weight:700; margin-bottom:.4em; display:flex; gap:.4em; align-items:baseline;}
+  .card-i .d{color:var(--muted); font-size:clamp(12px,1.3vw,15px); line-height:1.5;}
+  .card-i.acc-b{border-top:3px solid var(--blue2);} .card-i.acc-g{border-top:3px solid var(--green2);}
+  .card-i.acc-a{border-top:3px solid var(--amber2);} .card-i.acc-v{border-top:3px solid var(--violet);}
+  .card-i.lft{border-top:1px solid var(--line); border-left:3px solid var(--amber);}
+
+  .tag-row{display:flex; gap:9px; flex-wrap:wrap; margin-top:22px;}
+  .split .tag-row{justify-content:flex-start;}
+  .tag{border:1px solid var(--line); border-radius:999px; padding:6px 15px; font-size:12px; color:var(--muted);
+    letter-spacing:1px; background:rgba(255,255,255,.02);}
+  .authors{margin-top:16px; color:var(--muted); font-size:clamp(13px,1.5vw,18px);}
+  .q-pill{margin-top:20px; border:1px solid var(--line); background:rgba(96,165,250,.07); border-radius:14px;
+    padding:13px 22px; font-size:clamp(14px,1.6vw,19px); max-width:640px;}
+
+  table.tbl{border-collapse:separate; border-spacing:0; width:min(1040px,90vw); font-size:clamp(13px,1.5vw,18px);}
+  table.tbl th, table.tbl td{padding:13px 16px; text-align:left; border-bottom:1px solid var(--line);}
+  table.tbl th{color:var(--muted); font-weight:600; font-size:.9em;}
+  table.tbl td:first-child{font-weight:800;}
+  table.tbl tr.win td{background:rgba(16,185,129,.10);} table.tbl tr.win td:first-child{color:var(--green2);}
+
+  .funnel{display:flex; flex-direction:column; gap:11px; width:min(820px,88vw);}
+  .fn-row{display:flex; align-items:center; gap:16px;}
+  .fn-track{flex:0 0 min(560px,60%);}
+  .fn-bar{height:50px; border-radius:9px; background:linear-gradient(90deg,var(--blue),var(--blue2));
+    display:flex; align-items:center; padding-left:18px; font-weight:800; font-size:clamp(15px,1.8vw,22px);
+    color:#06122b; transform-origin:left center; white-space:nowrap;}
+  .fn-meta{flex:1 1 auto; min-width:0; color:var(--muted); font-size:clamp(11px,1.3vw,15px); line-height:1.3;}
+  .fn-drop{color:#fca5a5; font-weight:700;}
+
+  .ladder{display:flex; flex-direction:column; gap:0; width:100%; max-width:520px; align-items:center;}
+  .nest{border-radius:14px; padding:14px 18px; text-align:center; width:100%;}
+  .nest .lab{font-weight:800; font-size:clamp(14px,1.6vw,20px);}
+  .nest .desc{color:var(--muted); font-size:clamp(11px,1.2vw,14px); margin-top:3px;}
+  .nest.n25{background:rgba(59,130,246,.10); border:1px solid #2b3b66;}
+  .nest.n15{background:rgba(16,185,129,.12); border:1px solid var(--green); width:80%;}
+  .nest.n6{background:rgba(245,158,11,.14); border:1px solid var(--amber); width:58%;}
+  .nest .n{font-size:clamp(24px,3vw,38px); font-weight:800; line-height:1;}
+
+  .mtx{display:flex; gap:34px; align-items:center;}
+  .mtx-grid{display:grid; grid-template-columns:72px repeat(3,96px); grid-auto-rows:62px; gap:9px;}
+  .mcell{border:1px solid var(--line); border-radius:10px; background:var(--card); display:flex;
+    align-items:center; justify-content:center; font-size:13px; color:var(--muted); text-align:center; padding:4px;}
+  .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:14px;}
+  .mcell.algo{cursor:pointer; color:var(--blue2); font-weight:800; background:rgba(96,165,250,.08); border-color:#34507f;
+    transition:transform .15s, box-shadow .15s;}
+  .mcell.algo:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); border-color:var(--blue2);}
+  .mcell.win{background:linear-gradient(180deg,var(--green),#0e9f74); color:#04231a; font-weight:800; border-color:var(--green2);}
+  .mtx-hint{color:#33436e; font-size:12px; margin-top:14px; text-align:center;}
+
+  .chart{display:flex; gap:40px; align-items:flex-end; height:34vh; padding-top:48px;}
+  .barwrap{display:flex; flex-direction:column; align-items:center; gap:12px; width:140px;}
+  .bar{width:96px; border-radius:12px 12px 0 0; background:linear-gradient(180deg,var(--blue2),var(--blue)); height:0; position:relative;}
+  .bar.b15{background:linear-gradient(180deg,var(--green2),var(--green));}
+  .bar.b6{background:linear-gradient(180deg,var(--amber2),var(--amber));}
+  .bar .val{position:absolute; top:-34px; left:0; right:0; text-align:center; font-size:clamp(16px,1.8vw,26px); font-weight:800;}
+  .barwrap .cap{text-align:center; color:var(--muted); font-size:clamp(12px,1.3vw,15px);}
+  .barwrap .cap b{display:block; font-size:1.1em;}
+
+  .ghc{width:min(860px,90vw); display:flex; flex-direction:column; gap:20px;}
+  .ghc-grp .gl{font-size:clamp(14px,1.6vw,19px); font-weight:700; margin-bottom:8px;}
+  .ghbar{height:25px; border-radius:7px; position:relative; margin-bottom:18px; display:flex; align-items:center;}
+  .ghbar .t{position:absolute; left:12px; font-size:13px; color:#fff; font-weight:700;}
+  .ghbar .v{position:absolute; right:-56px; font-size:14px; font-weight:800; color:var(--ink);}
+  .ghbar.bin{background:linear-gradient(90deg,#7f1d1d,#b91c1c);}
+  .ghbar.tri{background:linear-gradient(90deg,#ea580c,#fb923c);} .ghbar.tri .t{color:#06122b;}
+
+  .imp{width:min(900px,90vw); display:flex; flex-direction:column; gap:12px;}
+  .imp-row{display:grid; grid-template-columns:240px 1fr 60px; align-items:center; gap:16px;}
+  .imp-name{text-align:right; font-size:clamp(13px,1.5vw,18px);}
+  .imp-track{height:26px; background:var(--card); border-radius:8px; overflow:hidden;}
+  .imp-fill{height:100%; width:0; border-radius:8px;}
+  .imp-val{font-variant-numeric:tabular-nums; color:var(--muted); font-size:14px;}
+
+  .kf{display:flex; align-items:center; gap:26px; flex-wrap:wrap; justify-content:center;}
+  .kf-box{text-align:center;} .kf-box .v{font-size:clamp(34px,5.6vw,74px); font-weight:800; line-height:1;}
+  .kf-box .l{color:var(--muted); font-size:clamp(12px,1.4vw,16px); margin-top:8px;}
+  .kf-eq{font-size:clamp(26px,3.4vw,48px); color:var(--muted);}
+  .kf-delta{background:rgba(16,185,129,.12); border:1px solid var(--green); border-radius:16px; padding:15px 24px;}
+
+  /* row2 (viz + image card) */
+  .row2{display:flex; gap:30px; align-items:center; width:min(1120px,92vw);}
+  .row2 > .half{flex:1; min-width:0; display:flex; justify-content:center;}
+  .imgcard{background:#fff; border-radius:14px; padding:10px;}
+  .imgcard img{display:block; width:100%; border-radius:8px;}
+
+  .demo-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:36px; width:min(1060px,90vw); align-items:center;}
+  .demo-panel{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px;}
+  .gauge{width:240px; height:140px; margin:0 auto; position:relative;}
+  .gauge svg{width:100%; height:100%;}
+  .gauge .pct{position:absolute; bottom:0; left:0; right:0; text-align:center; font-size:40px; font-weight:800;}
+  .demo-btn{margin-top:8px; width:100%; padding:13px; font-size:16px; font-weight:800; color:#06122b;
+    background:var(--blue2); border:none; border-radius:12px; cursor:pointer;}
+  .demo-btn:disabled{opacity:.5;}
+  .demo-status{color:var(--muted); font-size:13px; text-align:center; margin-top:9px; min-height:18px;}
+  .qr-card{background:#fff; padding:14px; border-radius:16px; display:inline-block;}
+  #qrcode img,#qrcode canvas{display:block;}
+  .qr-cap{margin-top:11px; color:var(--muted); font-size:clamp(13px,1.5vw,17px);}
+
+  .steps{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  .stp{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:15px;}
+  .stp .no{font-size:26px; font-weight:800; color:var(--blue2); line-height:1;}
+  .stp .st{font-weight:700; margin:7px 0 4px; font-size:clamp(13px,1.4vw,17px);}
+  .stp .sd{color:var(--muted); font-size:clamp(11px,1.2vw,13px); line-height:1.45;}
+
+  .flow{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .node{background:var(--card); border:1px solid var(--line); border-radius:13px; padding:14px 18px; text-align:center; min-width:130px;}
+  .node .ni{font-size:24px;} .node .nt{font-weight:700; margin-top:5px; font-size:14px;} .node .ns{color:var(--muted); font-size:11px; margin-top:2px;}
+  .arrow{color:var(--blue2); font-size:20px; display:flex; flex-direction:column; align-items:center; font-weight:700;}
+  .arrow small{font-size:10px; color:var(--muted);}
+
+  .lc-wrap{width:min(960px,92vw);}
+  .lc-legend{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:12px; font-size:13px;}
+  .lc-legend span{display:flex; align-items:center; gap:6px; color:var(--muted);}
+  .lc-legend i{width:18px; height:4px; border-radius:2px; display:inline-block;}
+
+  /* clickable evidence cards + modal */
+  .card-i.clk{cursor:pointer; transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; position:relative;}
+  .card-i.clk:hover{transform:translateY(-2px); border-left-color:var(--blue2); box-shadow:0 8px 26px rgba(0,0,0,.35);}
+  .card-i.clk::after{content:'🔍 點看實際資料'; position:absolute; top:12px; right:16px; font-size:11px; color:var(--blue2);
+    opacity:.55; transition:opacity .15s;}
+  .card-i.clk:hover::after{opacity:1;}
+  .modal-overlay{position:fixed; inset:0; z-index:100; background:rgba(4,8,18,.72); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; padding:6vh 6vw; opacity:0; visibility:hidden;}
+  .modal-overlay.open{opacity:1; visibility:visible;}
+  .modal-card{background:linear-gradient(180deg,#16213e,#111a2e); border:1px solid var(--line); border-radius:18px;
+    max-width:780px; width:100%; max-height:86vh; overflow:auto; padding:30px 34px; box-shadow:0 30px 80px rgba(0,0,0,.6);}
+  .modal-card h3{font-size:clamp(19px,2.4vw,28px); margin-bottom:6px;}
+  .modal-card .msub{color:var(--muted); font-size:14px; margin-bottom:18px;}
+  .modal-card p{color:#c7d3ea; font-size:clamp(13px,1.5vw,16px); line-height:1.6; margin:10px 0;}
+  .modal-card .mclose{float:right; color:var(--muted); cursor:pointer; font-size:22px; line-height:1; margin:-6px -8px 0 0;}
+  .ev-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+  .ev-table th,.ev-table td{padding:9px 12px; border-bottom:1px solid var(--line); text-align:left;}
+  .ev-table th{color:var(--muted); font-weight:600;}
+  .ev-table td.hl{color:var(--amber2); font-weight:800; font-variant-numeric:tabular-nums;}
+  .ev-table td:last-child{font-variant-numeric:tabular-nums;}
+  .ev-note{background:rgba(245,158,11,.1); border-left:3px solid var(--amber); border-radius:8px; padding:11px 14px;
+    font-size:13px; color:#fde68a; margin-top:14px;}
+  .ev-good{background:rgba(16,185,129,.1); border-left:3px solid var(--green); border-radius:8px; padding:11px 14px;
+    font-size:13px; color:#a7f3d0; margin-top:14px;}
+  .ev-bars{display:flex; flex-direction:column; gap:7px; margin:14px 0;}
+  .ev-bar-row{display:grid; grid-template-columns:46px 1fr 92px; align-items:center; gap:10px; font-size:13px;}
+  .ev-bar-track{height:20px; background:#0e1830; border-radius:5px; overflow:hidden;}
+  .ev-bar-fill{height:100%; background:linear-gradient(90deg,var(--blue),var(--blue2)); border-radius:5px;}
+  .ev-bar-fill.amb{background:linear-gradient(90deg,#b45309,var(--amber2));}
+  .ev-imgs{display:flex; gap:10px; margin:14px 0; flex-wrap:wrap;}
+  .ev-imgs figure{flex:1; min-width:160px; background:#fff; border-radius:10px; padding:6px; margin:0;}
+  .ev-imgs img{width:100%; display:block; border-radius:6px;}
+  .ev-imgs figcaption{text-align:center; font-size:12px; color:#334155; margin-top:4px; font-weight:600;}
+  .modal-card.wide{max-width:920px;}
+  /* clickable table rows */
+  table.tbl tr.clk{cursor:pointer; transition:background .15s;}
+  table.tbl tr.clk:hover td{background:rgba(96,165,250,.10);}
+  table.tbl tr.clk td:first-child::after{content:' 🔍'; font-size:.7em; opacity:.5;}
+
+  .concl{width:100%; max-width:760px; display:flex; flex-direction:column; gap:14px;}
+  .cc{display:flex; gap:16px; align-items:flex-start;}
+  .cc .num{flex:none; width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:18px; background:var(--card); border:1px solid var(--line);}
+  .cc .ct{font-size:clamp(15px,1.7vw,21px);} .cc .cd{color:var(--muted); font-size:clamp(12px,1.3vw,15px); margin-top:3px;}
+  .res-row{display:flex; gap:20px; flex-wrap:wrap; margin-top:18px; color:var(--muted); font-size:13px;}
+  .res-row b{color:var(--blue2);}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="chrome tl">肥胖風險預測 · 第五組</div>
+<div class="chrome br"><span id="slideNo">1</span> / <span id="slideTotal">20</span></div>
+<div class="hint">← → / 空白鍵 翻頁 · F 全螢幕 · 點畫面左右翻頁</div>
+
+<!-- 1 COVER -->
+<section class="slide split" data-slide="cover">
+  <div class="col-main">
+    <div class="sub" data-anim style="text-align:left; letter-spacing:3px;">機器學習期末報告 · 第五組</div>
+    <h1 data-anim style="text-align:left; margin-top:14px;">結合生活指標與行為趨勢之<br><span class="accent">肥胖風險預測模型</span></h1>
+    <div class="authors" data-anim>14773008 賴百擎 · 11773037 陳宗傑</div>
+    <div class="q-pill" data-anim>不靠醫療紀錄、不靠 BMI，只用日常生活行為，能否準確預測肥胖風險？<span class="em-amber">最少要幾個變數？</span></div>
+    <div class="tag-row" data-anim>
+      <span class="tag">BRFSS 2022</span><span class="tag">XGBOOST + SMOTE</span><span class="tag">BEHAVIORAL PUBLIC HEALTH</span>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s01_hero.png" alt=""></div>
+  <a href="#16" onclick="go(15);return false;" title="Demo" style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">▶ demo</a>
+</section>
+
+<!-- 2 MOTIVATION -->
+<section class="slide split" data-slide="m02">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>動機：從「落後指標 BMI」走向「<span class="k">領先指標 行為</span>」</h2></div>
+    <div class="grid g1">
+      <div class="card-i acc-b" data-anim><div class="t">🌍 全球肥胖危機</div><div class="d">全球逾 <b>10 億人</b>受肥胖困擾，台灣成人過重肥胖率 <b>超過 50%</b>。傳統 BMI 是<b class="em-red">事後測量</b>，無法提前預警。</div></div>
+      <div class="card-i acc-g" data-anim><div class="t">📊 生活行為才是關鍵</div><div class="d">睡眠、吸菸、飲酒、運動是<b class="em-green">領先指標</b>。ML 可量化「行為 → 風險」的對應關係。</div></div>
+      <div class="card-i acc-a" data-anim><div class="t">💡 本研究問題</div><div class="d">只用日常行為，能否準確預測肥胖風險？<b class="em-amber">最少要幾個變數？</b></div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s02_hero.png" alt=""></div>
+</section>
+
+<!-- 3 ITERATION -->
+<section class="slide" data-slide="m03">
+  <div class="head"><h2 data-anim>三版本迭代：<span class="k">從失敗中換來的判斷力</span></h2>
+  <div class="lead" data-anim>每一次踩坑，都讓我們更清楚「什麼才是真正可用的資料」。<span style="color:#33436e;">（點任一版本看詳情）</span></div></div>
+  <table class="tbl">
+    <thead><tr><th>版本</th><th>資料集</th><th>規模</th><th>為何放棄 / 採用</th></tr></thead>
+    <tbody>
+      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Kaggle obesity_level</td><td>2,111 筆</td><td>❌ 合成資料，BMI 邊界不符 WHO 標準</td></tr>
+      <tr class="clk" data-anim data-modal="v2"><td>v2</td><td>Kaggle heart_2020</td><td>320k 筆</td><td>❌ 僅 18 欄、COVID 首年、無睡眠變數</td></tr>
+      <tr class="win clk" data-anim data-modal="v3"><td>v3 ✅</td><td>CDC BRFSS 2022 原始 XPT</td><td>445k → 329k</td><td>✅ 官方原始、328 變數可選、含睡眠</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 4 DATA SOURCE -->
+<section class="slide split" data-slide="m04">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>資料來源：<span class="k">CDC BRFSS 2022</span></h2><div class="lead" data-anim>全美規模最大的健康行為調查</div></div>
+    <div class="grid g2">
+      <div class="card-i acc-b" data-anim><div class="t">資料來源</div><div class="d">Behavioral Risk Factor Surveillance System 2022，US CDC，全美各州電話訪問。</div></div>
+      <div class="card-i acc-b" data-anim><div class="t">原始規格</div><div class="d">SAS Transport（.XPT），<b>445,132 筆 × 328 變數</b>。</div></div>
+      <div class="card-i acc-g" data-anim><div class="t">為何選 2022</div><div class="d">偶數年缺 SLEPTIM1 睡眠時數；2022 是最新完整的奇數年。</div></div>
+      <div class="card-i acc-g" data-anim><div class="t">代表性與自由度</div><div class="d">掌握原始 328 變數，才能自由設計三層特徵集。</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s04_hero.png" alt=""></div>
+</section>
+
+<!-- 5 ETL FUNNEL -->
+<section class="slide" data-slide="m05">
+  <div class="head"><h2 data-anim>ETL 清理流程 — <span class="k">445,132 → 329,126 筆</span>（保留率 73.9%）</h2></div>
+  <div class="funnel" id="funnel">
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:100%">445,132</div></div><div class="fn-meta">原始 BRFSS 2022（XPT）</div></div>
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:89%">396,326</div></div><div class="fn-meta">刪 BMI 缺值 <span class="fn-drop">−48,806</span></div></div>
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:88%">392,216</div></div><div class="fn-meta">移除 SLEPTIM1 無效（77/99）<span class="fn-drop">−4,110</span></div></div>
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:76%">338,666</div></div><div class="fn-meta">刪核心欄位無效值 <span class="fn-drop">−53,550</span></div></div>
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:74%; background:linear-gradient(90deg,var(--green),var(--green2)); color:#04231a;">329,126</div></div><div class="fn-meta em-green">✅ 清理 4 個 v3 變數 + 修正 99900 異常碼 → 最終 26 欄</div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:3vh;">體重過輕重編為正常（n=6,778，改標籤不刪行）；每一步都基於資料字典逐欄判斷。</div>
+</section>
+
+<!-- 6 ETL DECISIONS -->
+<section class="slide split" data-slide="m06">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>ETL 關鍵編碼決策</h2><div class="lead" data-anim>魔鬼藏在編碼細節裡</div></div>
+    <div class="grid g1">
+      <div class="card-i lft clk" data-anim data-modal="menthlth"><div class="t">MENTHLTH / PHYSHLTH = 88</div><div class="d">→ <b>0 天</b>。BRFSS 用 88 代表「沒有任何一天不適」，不可當缺值刪。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。v3 新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="genhlth"><div class="t">GENHLTH 反向處理</div><div class="d">原始 1=最好、5=最差，反向後讓<b>數值方向與風險一致</b>。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="conttype"><div class="t">連續 vs 類別</div><div class="d">連續特徵保留原值；類別特徵 <b>Label Encoding</b>。</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s06_hero.png" alt=""></div>
+</section>
+
+<!-- 7 FEATURE LADDER + PYRAMID -->
+<section class="slide" data-slide="m07">
+  <div class="head"><h2 data-anim>特徵集設計：<span class="k">三層階梯式消除</span></h2>
+  <div class="lead" data-anim>嚴格包含關係 Core_6 ⊂ Behav_15 ⊂ Full_25，才能乾淨歸因「準確率變化來自哪一類變數」。</div></div>
+  <div class="row2">
+    <div class="half">
+      <div class="ladder">
+        <div class="nest n6" data-anim><span class="n em-amber">6</span><div class="lab">Core_6（最簡可行模型）</div><div class="desc">純行為：睡眠/吸菸/飲酒/運動/自評健康</div></div>
+        <div class="nest n15" data-anim><span class="n em-green">15</span><div class="lab">Behav_15（移除慢性病）</div><div class="desc">不需病史也能預測？</div></div>
+        <div class="nest n25" data-anim><span class="n accent">25</span><div class="lab">Full_25（上限 Baseline）</div><div class="desc">行為 + 健康 + 7 項慢性病 + 人口統計</div></div>
+      </div>
+    </div>
+    <div class="half" data-anim><div class="imgcard" style="max-width:440px;"><img src="assets/img/s07_pyramid.png" alt="三層特徵金字塔"></div></div>
+  </div>
+</section>
+
+<!-- 8 27 MATRIX -->
+<section class="slide" data-slide="m08">
+  <div class="head"><h2 data-anim>模型訓練：<span class="k">27 組實驗矩陣</span> — 3 特徵集 × 3 演算法 × 3 抽樣</h2></div>
+  <div class="mtx">
+    <div>
+      <div class="mtx-grid" id="mtx27">
+        <div class="mcell lbl"></div>
+        <div class="mcell algo clk" data-modal="algo_lr">LR</div>
+        <div class="mcell algo clk" data-modal="algo_rf">RF</div>
+        <div class="mcell algo clk" data-modal="algo_xgb">XGBoost</div>
+        <div class="mcell lbl">Raw</div>
+        <div class="mcell">基準線</div><div class="mcell">抗噪較強</div><div class="mcell">對照組</div>
+        <div class="mcell lbl">SMOTE</div>
+        <div class="mcell">補少數類</div><div class="mcell">抗過擬合</div><div class="mcell win">🏆 最佳</div>
+        <div class="mcell lbl">Under</div>
+        <div class="mcell">降採樣</div><div class="mcell">—</div><div class="mcell">—</div>
+      </div>
+      <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣</div>
+    </div>
+    <div style="max-width:300px;">
+      <div class="lead" data-anim style="text-align:left;">直欄 = 演算法、橫列 = 抽樣策略。每格 × <b>3 個特徵集</b> = <b class="accent">27 組模型</b>。<br><br>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數奪冠</b>。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 EVALUATION -->
+<section class="slide" data-slide="m09">
+  <div class="head"><h2 data-anim>評估方法與指標 — <span class="k">公平比較 27 組的共同標準</span></h2></div>
+  <div class="grid g3">
+    <div class="card-i acc-b" data-anim><div class="t">資料切分</div><div class="d"><b>80/20</b> train-test split，<b>stratified</b> 維持各 BMI 類別比例。</div></div>
+    <div class="card-i acc-g" data-anim><div class="t">主指標：Macro F1</div><div class="d">三類不平衡，Accuracy 會被多數類灌水；<b>Macro F1</b> 對少數類更公平。</div></div>
+    <div class="card-i acc-v" data-anim><div class="t">SMOTE 原理</div><div class="d">對少數類在特徵空間「內插」生成合成樣本，<b>只在訓練集做</b>，避免資訊洩漏。</div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
+</section>
+
+<!-- 10 CONTRIBUTION -->
+<section class="slide split" data-slide="m10">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>研究貢獻與展望</h2></div>
+    <div class="grid g2">
+      <div class="card-i acc-g" data-anim><div class="t">🎯 主要發現</div><div class="d">僅 6 項純行為，XGBoost+SMOTE 即達實用水準，無需病史。</div></div>
+      <div class="card-i acc-b" data-anim><div class="t">📋 公衛意涵</div><div class="d">行為為領先指標，可作低成本早期預警，適用社區健康促進。</div></div>
+      <div class="card-i acc-v" data-anim><div class="t">🔬 方法貢獻</div><div class="d">三層特徵集量化每類變數的預測貢獻，可解釋。</div></div>
+      <div class="card-i acc-a" data-anim><div class="t">🚀 未來方向</div><div class="d">納入縱貫資料、整合穿戴裝置，朝動態個人化評估。</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s10_hero.png" alt=""></div>
+</section>
+
+<!-- 11 F1 RESULTS BARS -->
+<section class="slide split" data-slide="m11">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>結果：F1 成績總表</h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
+    <div class="chart" id="chart11">
+      <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>25 特徵</div></div>
+      <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>15 行為</div></div>
+      <div class="barwrap"><div class="bar b6" data-bar="0.6082"><span class="val" data-count="0.6082">0</span></div><div class="cap"><b>Core_6</b>6 核心</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s11_hero.png" alt=""></div>
+</section>
+
+<!-- 12 BINARY VS 3CLASS -->
+<section class="slide" data-slide="m12">
+  <div class="head"><h2 data-anim>Binary vs 3-Class：<span class="k">分類成績一覽</span></h2></div>
+  <div class="ghc" id="ghc12">
+    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
+      <div class="ghbar bin" data-w="98"><span class="t">Binary F1</span><span class="v">0.6867</span></div>
+      <div class="ghbar tri" data-w="71"><span class="t">3-Class F1</span><span class="v">0.4955</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
+      <div class="ghbar bin" data-w="97"><span class="t">Binary F1</span><span class="v">0.6800</span></div>
+      <div class="ghbar tri" data-w="69"><span class="t">3-Class F1</span><span class="v">0.4831</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
+      <div class="ghbar bin" data-w="87"><span class="t">Binary F1</span><span class="v">0.6082</span></div>
+      <div class="ghbar tri" data-w="60"><span class="t">3-Class F1</span><span class="v">0.4187</span></div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:2vh;">Binary 普遍比 3-Class 高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。</div>
+</section>
+
+<!-- 13 KEY FINDING -->
+<section class="slide" data-slide="m13">
+  <div class="head"><h2 data-anim>🔑 關鍵發現：<span class="k">行為勝過慢性病史</span></h2></div>
+  <div class="kf">
+    <div class="kf-box" data-anim><div class="v accent">0.6867</div><div class="l">Full_25（含 7 項病歷）</div></div>
+    <div class="kf-eq" data-anim>−</div>
+    <div class="kf-box" data-anim><div class="v em-green">0.6800</div><div class="l">Behav_15（無病歷）</div></div>
+    <div class="kf-eq" data-anim>=</div>
+    <div class="kf-delta kf-box" data-anim><div class="v em-amber" data-count="0.0067">0</div><div class="l">差距 &lt; 1%</div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:3.4vh; max-width:860px;">慢性病史邊際貢獻 <b>&lt; 1%</b>；Core_6 僅 6 問達 <b class="em-amber">F1=0.608</b>，與 25 變數差距僅 0.078。<br>→ 公衛應優先投資<b class="em-green">行為介入</b>（睡眠、戒菸、運動），而非侵入式篩檢。</div>
+</section>
+
+<!-- 14 IMPORTANCE -->
+<section class="slide" data-slide="m14">
+  <div class="head"><h2 data-anim>特徵重要度排行（Full_25 · Binary XGBoost）</h2></div>
+  <div class="imp" id="imp14">
+    <div class="imp-row" data-anim><div class="imp-name">自評健康 GENHLTH</div><div class="imp-track"><div class="imp-fill" data-w="100" style="background:linear-gradient(90deg,#7f1d1d,#b91c1c)"></div></div><div class="imp-val">0.120</div></div>
+    <div class="imp-row" data-anim><div class="imp-name">年齡層 Age_Group</div><div class="imp-track"><div class="imp-fill" data-w="92" style="background:linear-gradient(90deg,#9a3412,#c2410c)"></div></div><div class="imp-val">0.110</div></div>
+    <div class="imp-row" data-anim><div class="imp-name">氣喘 Asthma 新</div><div class="imp-track"><div class="imp-fill" data-w="78" style="background:linear-gradient(90deg,#c2410c,#ea580c)"></div></div><div class="imp-val">0.093</div></div>
+    <div class="imp-row" data-anim><div class="imp-name">運動 Physical_Activity</div><div class="imp-track"><div class="imp-fill" data-w="71" style="background:linear-gradient(90deg,#ea580c,#f97316)"></div></div><div class="imp-val">0.085</div></div>
+    <div class="imp-row" data-anim><div class="imp-name">睡眠 Sleep_Hours</div><div class="imp-track"><div class="imp-fill" data-w="67" style="background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="imp-val">0.080</div></div>
+    <div class="imp-row" data-anim><div class="imp-name">看牙醫 Dental_Visit 新</div><div class="imp-track"><div class="imp-fill" data-w="62" style="background:linear-gradient(90deg,#fb923c,#fdba74)"></div></div><div class="imp-val">0.075</div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:2.4vh;">💡 意外：<b class="em-amber">Dental_Visit（看牙醫）排第 6</b>——定期看牙者健康意識較高，成為肥胖風險的隱性代理變數。</div>
+</section>
+
+<!-- 15 DEMO STEPS + QR + ILLUSTRATION -->
+<section class="slide split" data-slide="m15">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>🎯 現場互動預測 Demo</h2><div class="lead" data-anim>輸入你的生活習慣，立刻查看個人化肥胖風險。</div></div>
+    <div class="steps" data-anim>
+      <div class="stp"><div class="no">01</div><div class="st">掃 QR 開啟網頁</div><div class="sd">手機瀏覽器直接運行。</div></div>
+      <div class="stp"><div class="no">02</div><div class="st">選擇版本</div><div class="sd">簡易版 6 項 / 完整版 15 項。</div></div>
+      <div class="stp"><div class="no">03</div><div class="st">填寫生活習慣</div><div class="sd">睡眠、運動、飲酒等。</div></div>
+      <div class="stp"><div class="no">04</div><div class="st">查看風險儀表板</div><div class="sd">🟢&lt;35% 🟡35–65% 🔴&gt;65%</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s15_hero.png" alt=""></div>
+</section>
+
+<!-- 16 DEMO ARCH + LIVE -->
+<section class="slide" data-slide="m16">
+  <div class="head"><h2 data-anim>🎯 現場 Demo — <span class="k">掃 QR 試打 ＋ 週追蹤模擬</span></h2></div>
+  <div class="demo-grid">
+    <div data-anim style="text-align:center;">
+      <div class="qr-card"><div id="qrcode"></div></div>
+      <div class="qr-cap"><b>① 同學現在掃 ↑</b> 開手機版填自己的習慣</div>
+      <div class="flow" style="justify-content:center; margin-top:18px;">
+        <div class="node"><div class="ni">📱</div><div class="nt">手機</div><div class="ns">填表單</div></div>
+        <div class="arrow">→<small>POST</small></div>
+        <div class="node"><div class="ni">⚙️</div><div class="nt">FastAPI</div><div class="ns">.pkl 推論</div></div>
+        <div class="arrow">→<small>機率</small></div>
+        <div class="node"><div class="ni">📊</div><div class="nt">儀表板</div><div class="ns">看結果</div></div>
+      </div>
+    </div>
+    <div class="demo-panel" data-anim>
+      <div style="text-align:center; color:var(--muted); font-size:13px;">② 開「單日試打」頁 · 跟同學掃的 QR 同一頁</div>
+      <a href="demo_single.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none; margin-top:16px;">▶ API</a>
+      <div class="demo-status" id="demoStatus" style="margin:10px 0 4px;">填一天 → 真打 API → 改善 / 惡化 雙 Y 軸曲線</div>
+      <a href="tracker.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px; background:linear-gradient(90deg,var(--violet),var(--blue2));">📈 ③ 開啟「16 週追蹤」Demo（台上版）</a>
+    </div>
+  </div>
+</section>
+
+<!-- 17 DYNAMIC TRACKING -->
+<section class="slide" data-slide="m17">
+  <div class="head"><h2 data-anim>動態追蹤：<span class="k">6 場景 × 16 週模擬</span></h2></div>
+  <div class="lc-wrap">
+    <svg id="lc" viewBox="0 0 920 360" style="width:100%; height:auto;"></svg>
+    <div class="lc-legend" data-anim>
+      <span><i style="background:#34d399"></i>改善·男 58→32</span>
+      <span><i style="background:#10b981"></i>改善·女 55→30</span>
+      <span><i style="background:#ef4444"></i>惡化·男 32→38</span>
+      <span><i style="background:#60a5fa"></i>穩定·健康 7</span>
+      <span><i style="background:#f59e0b"></i>穩定·高風險 38</span>
+    </div>
+  </div>
+</section>
+
+<!-- 18 DISCUSSION + DIAGRAM -->
+<section class="slide" data-slide="m18">
+  <div class="head"><h2 data-anim>Discussion：<span class="k">截面資料的根本限制</span></h2></div>
+  <div class="row2">
+    <div class="half" style="flex-direction:column; align-items:stretch; gap:14px; display:flex;">
+      <div class="card-i acc-a" data-anim><div class="t">觀察到的異常</div><div class="d">男性行為全部改善時，Core_6 機率<b class="em-green">正確下降</b>，但 Behav_15 卻從 <b>50% 升到 72%</b>。</div></div>
+      <div class="card-i acc-v" data-anim><div class="t">原因解析</div><div class="d">sex=1（男）+ age_group=6（中年）是<b>強錨點</b>；截面非縱向，模型學到「中年男性群體風險偏高」，無法捕捉個人縱向改變。</div></div>
+      <div class="lead" data-anim style="text-align:left;"><b class="em-green">Core_6 無人口錨定，方向反而更穩定。</b></div>
+    </div>
+    <div class="half" data-anim><div class="imgcard" style="max-width:430px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
+  </div>
+</section>
+
+<!-- 19 FUTURE WORK -->
+<section class="slide split" data-slide="m19">
+  <div class="col-main">
+    <div class="head"><h2 data-anim>Future Work：<span class="k">從預測到介入</span></h2></div>
+    <div class="grid g1">
+      <div class="card-i acc-b" data-anim><div class="t">⌚ 整合穿戴式裝置</div><div class="d">結合 Apple Watch、Fitbit 4–12 週資料，捕捉同一人不同時間點的行為與 BMI 變化。</div></div>
+      <div class="card-i acc-v" data-anim><div class="t">💊 臨床藥物效果模擬</div><div class="d">疊加 STEP-1（Semaglutide −14.9%）與 SURMOUNT-1（Tirzepatide −20.9%）文獻數據。</div></div>
+      <div class="card-i acc-g" data-anim><div class="t">🧪 介入策略 A/B 測試</div><div class="d">以 Core_6 預測風險 → 建議行為改變 → 4 週後再預測，量化介入效果。</div></div>
+    </div>
+  </div>
+  <div class="col-photo" data-anim><img src="assets/img/s19_hero.png" alt=""></div>
+</section>
+
+<!-- 20 CONCLUSION -->
+<section class="slide" data-slide="m20">
+  <div class="head"><h2 data-anim>結論 · Q&amp;A · 致謝</h2></div>
+  <div class="concl">
+    <div class="cc" data-anim><div class="num accent">1</div><div><div class="ct">資料為王</div><div class="cd">回歸 CDC 原始 XPT，是 v3 成功的關鍵。</div></div></div>
+    <div class="cc" data-anim><div class="num em-green">2</div><div><div class="ct">行為足以預測肥胖</div><div class="cd">6 問達 F1=0.608；15 變數達 0.680，僅比全特徵低 1%。</div></div></div>
+    <div class="cc" data-anim><div class="num em-amber">3</div><div><div class="ct">截面模型有其限制</div><div class="cd">跨個人預測穩定，縱向敏感度受限，是未來研究契機。</div></div></div>
+  </div>
+  <div class="res-row" data-anim>
+    <span>🔗 Demo 互動網站（掃 QR）</span><span>API：<b>obesity-api-2-2ro4.onrender.com/docs</b></span><span>GitHub：<b>github.com/inorino/obesity-api-2</b></span>
+  </div>
+  <div class="res-row" data-anim style="font-size:12px;">📚 Jastreboff et al. (2022) Tirzepatide, NEJM 387(3) · Wilding et al. (2021) Semaglutide, NEJM 384(11)</div>
+</section>
+
+<!-- evidence modal -->
+<div class="modal-overlay" id="modal"><div class="modal-card" id="modalCard"></div></div>
+
+<script src="assets/js/gsap.min.js"></script>
+<script src="assets/js/qrcode.min.js"></script>
+<script>
+const API_BASE='https://obesity-api-2-2ro4.onrender.com';
+// TODO: 換成你 index.html 部署後的線上網址（同學掃這個）
+const DEMO_URL='https://inorino.github.io/obesity-demo/';
+
+const slides=Array.from(document.querySelectorAll('.slide'));
+let idx=0;
+document.getElementById('slideTotal').textContent=slides.length;
+
+function playIntro(slide){
+  const items=slide.querySelectorAll('[data-anim]');
+  if(items.length) gsap.fromTo(items,{y:26,opacity:0},{y:0,opacity:1,duration:.55,ease:'power3.out',stagger:.08});
+  const b=builders[slide.dataset.slide]; if(b) b(slide);
+}
+function go(n){
+  n=Math.max(0,Math.min(slides.length-1,n));
+  if(n===idx && slides[idx].classList.contains('active')) return;
+  slides[idx].classList.remove('active');
+  idx=n; const s=slides[idx]; s.classList.add('active');
+  document.getElementById('slideNo').textContent=idx+1;
+  document.getElementById('progress').style.width=((idx)/(slides.length-1))*100+'%';
+  requestAnimationFrame(()=>playIntro(s));
+}
+document.addEventListener('keydown',(e)=>{
+  if(modalOpen){ if(e.key==='Escape')closeModal(); e.preventDefault(); return; }
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(idx+1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(idx-1);}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(slides.length-1);
+  else if(e.key==='f'||e.key==='F')toggleFs();
+});
+document.addEventListener('click',(e)=>{
+  if(modalOpen) return;
+  if(e.target.closest('button')||e.target.closest('a')||e.target.closest('.clk'))return;
+  if(e.clientX>window.innerWidth*0.62)go(idx+1);
+  else if(e.clientX<window.innerWidth*0.38)go(idx-1);
+});
+function toggleFs(){ if(!document.fullscreenElement)document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+
+function countEls(s){
+  s.querySelectorAll('[data-count]').forEach(el=>{
+    const tgt=parseFloat(el.dataset.count); const dec=(el.dataset.count.split('.')[1]||'').length;
+    const o={v:0}; gsap.to(o,{v:tgt,duration:1,ease:'power2.out',delay:.3,onUpdate:()=>el.textContent=o.v.toFixed(dec)});
+  });
+}
+const builders={
+  m05(s){const bars=s.querySelectorAll('.fn-bar');
+    gsap.fromTo(bars,{scaleX:0},{scaleX:1,duration:.65,ease:'power2.out',stagger:.13});
+    gsap.fromTo(s.querySelectorAll('.fn-meta'),{opacity:0,x:-10},{opacity:1,x:0,duration:.45,stagger:.13,delay:.12});},
+  m07(s){gsap.fromTo(s.querySelectorAll('.nest'),{y:40,opacity:0,scale:.92},{y:0,opacity:1,scale:1,duration:.55,ease:'back.out(1.5)',stagger:.16});},
+  m08(s){gsap.fromTo(s.querySelectorAll('.mcell'),{opacity:0,scale:.8},{opacity:1,scale:1,duration:.4,ease:'power2.out',stagger:.03});},
+  m11(s){s.querySelectorAll('.bar').forEach(b=>{
+    const t=parseFloat(b.dataset.bar),maxH=24;
+    gsap.fromTo(b,{height:0},{height:(t*maxH/0.8)+'vh',duration:1,ease:'power2.out',delay:.2});
+    const v=b.querySelector('.val'),o={v:0};
+    gsap.to(o,{v:t,duration:1,ease:'power2.out',delay:.2,onUpdate:()=>v.textContent=o.v.toFixed(4)});});},
+  m12(s){gsap.fromTo(s.querySelectorAll('.ghbar'),{width:0},{width:(i,el)=>el.dataset.w+'%',duration:.85,ease:'power2.out',stagger:.08,delay:.2});},
+  m13(s){countEls(s);},
+  m14(s){gsap.fromTo(s.querySelectorAll('.imp-fill'),{width:0},{width:(i,el)=>el.dataset.w+'%',duration:.8,ease:'power2.out',stagger:.1,delay:.2});},
+  m17(s){drawLineChart();}
+};
+
+function drawLineChart(){
+  const svg=document.getElementById('lc');
+  const W=920,H=360,padL=58,padR=20,padT=20,padB=40;
+  const x0=padL,x1=W-padR,y0=H-padB,y1=padT,weeks=16,ymax=70;
+  const X=w=>x0+(x1-x0)*(w/weeks),Y=p=>y0+(y1-y0)*(p/ymax);
+  function series(s0,s1){const a=[];for(let w=0;w<=weeks;w++){const t=w/weeks,e=t*t*(3-2*t);a.push(s0+(s1-s0)*e);}return a;}
+  const lines=[{c:'#34d399',d:series(58,32)},{c:'#10b981',d:series(55,30)},{c:'#ef4444',d:series(32,38)},{c:'#60a5fa',d:series(7,7)},{c:'#f59e0b',d:series(38,38)}];
+  const NS='http://www.w3.org/2000/svg'; svg.innerHTML='';
+  for(let p=0;p<=70;p+=10){
+    const ln=document.createElementNS(NS,'line');
+    ln.setAttribute('x1',x0);ln.setAttribute('x2',x1);ln.setAttribute('y1',Y(p));ln.setAttribute('y2',Y(p));
+    ln.setAttribute('stroke','#27355a');ln.setAttribute('stroke-dasharray','4 5');svg.appendChild(ln);
+    const tx=document.createElementNS(NS,'text');
+    tx.setAttribute('x',x0-10);tx.setAttribute('y',Y(p)+4);tx.setAttribute('fill','#90a0c2');
+    tx.setAttribute('font-size','12');tx.setAttribute('text-anchor','end');tx.textContent=p+'%';svg.appendChild(tx);
+  }
+  [0,4,8,12,16].forEach(w=>{const tx=document.createElementNS(NS,'text');
+    tx.setAttribute('x',X(w));tx.setAttribute('y',y0+24);tx.setAttribute('fill','#90a0c2');
+    tx.setAttribute('font-size','12');tx.setAttribute('text-anchor','middle');tx.textContent='第'+w+'週';svg.appendChild(tx);});
+  lines.forEach((L,li)=>{
+    const pts=L.d.map((p,w)=>X(w)+','+Y(p)).join(' ');
+    const pl=document.createElementNS(NS,'polyline');
+    pl.setAttribute('points',pts);pl.setAttribute('fill','none');pl.setAttribute('stroke',L.c);
+    pl.setAttribute('stroke-width','3.5');pl.setAttribute('stroke-linejoin','round');pl.setAttribute('stroke-linecap','round');
+    svg.appendChild(pl);
+    const len=pl.getTotalLength(); pl.style.strokeDasharray=len; pl.style.strokeDashoffset=len;
+    gsap.to(pl.style,{strokeDashoffset:0,duration:1.4,ease:'power2.inOut',delay:.2+li*0.12});
+    const dot=document.createElementNS(NS,'circle');
+    dot.setAttribute('cx',X(weeks));dot.setAttribute('cy',Y(L.d[weeks]));dot.setAttribute('r','5');dot.setAttribute('fill',L.c);
+    dot.style.opacity=0;gsap.to(dot.style,{opacity:1,duration:.3,delay:1.5+li*0.12});svg.appendChild(dot);
+  });
+}
+
+/* ===== evidence modals（真實資料來自 brfss2022_clean.csv n=329,126）===== */
+const MODALS={
+  menthlth:{title:'MENTHLTH / PHYSHLTH = 88 是什麼？',sub:'BRFSS 心理 / 身體不適天數',html:`
+    <p>BRFSS 編碼簿：<b>1–30</b> = 不適天數，<b>88</b> = 「沒有任何一天不適」，<b>77/99</b> = 不知道 / 拒答。</p>
+    <p><b>原始資料證據</b>：MENTHLTH 與 PHYSHLTH 中，<b class="em-amber">88 都是出現最多的值</b>（col_stats top1）。</p>
+    <table class="ev-table"><thead><tr><th>欄位</th><th>值=88 → 0 天</th><th>佔全體</th></tr></thead><tbody>
+      <tr><td>mental_health_days</td><td class="hl">198,319</td><td>60.3%</td></tr>
+      <tr><td>physical_health_days</td><td class="hl">203,208</td><td>61.7%</td></tr></tbody></table>
+    <div class="ev-note">⚠️ 若把 88 當缺值刪除，會一次<b>錯刪約 6 成樣本</b>（≈ 20 萬筆）——這是最容易踩的坑。</div>`},
+  drnkwk2:{title:'_DRNKWK2 = 99900 是什麼？',sub:'BRFSS 每週估計飲酒量（×100）',html:`
+    <p>_DRNKWK2 = 每週飲酒杯數 × 100。<b>99900</b> 是「不知道 / 拒答」的<b>無效值佔位</b>，÷100 後會變成假的 999 杯。</p>
+    <p><b>原始資料證據</b>：99900 是該欄第 2 常見值，max 也正是 99900（nunique=173）。</p>
+    <div class="ev-bars">
+      <div class="ev-bar-row"><span>修正前</span><div class="ev-bar-track"><div class="ev-bar-fill amb" style="width:100%"></div></div><span>max = 999</span></div>
+      <div class="ev-bar-row"><span>修正後</span><div class="ev-bar-track"><div class="ev-bar-fill" style="width:53%"></div></div><span>max = 532</span></div>
+    </div>
+    <div class="ev-good">✅ 移除 <b>2,114 筆</b> 99900 異常碼後，drinks_per_week 上限從 999 → <b>532</b>（回到合理範圍）。這是 v3 才抓到的 bug。</div>`},
+  genhlth:{title:'GENHLTH 為什麼要反向？',sub:'自評整體健康',html:`
+    <p>原始編碼：<b>1=非常好 … 5=很差</b>，<b>7/9</b> = 不知道 / 拒答（已移除）。原始方向是「數值越大越健康」的相反，容易誤讀。</p>
+    <p>反向後讓<b>數值越大 = 風險越高</b>，與其他特徵方向一致，模型與圖表更好解讀。</p>
+    <table class="ev-table"><thead><tr><th>反向後分數</th><th>意義</th><th>筆數</th></tr></thead><tbody>
+      <tr><td>1</td><td>非常好</td><td>54,783</td></tr>
+      <tr><td>2</td><td>很好</td><td>115,846</td></tr>
+      <tr><td>3</td><td>普通</td><td>104,185</td></tr>
+      <tr><td>4</td><td>不太好</td><td>41,397</td></tr>
+      <tr><td>5</td><td>很差</td><td>12,915</td></tr></tbody></table>`},
+  conttype:{title:'連續 vs 類別 特徵怎麼處理？',sub:'不同型別、不同編碼策略',html:`
+    <p><b>連續特徵（保留原值）</b>：sleep_hours、drinks_per_week、mental_health_days、physical_health_days。樹模型可直接吃數值。</p>
+    <p><b>類別特徵（Label Encoding）</b>：smoking_status、general_health、age_group、education、income、employment、sex、diff_walking… 轉成整數類別碼。</p>
+    <div class="ev-good">✅ XGBoost / RF 對單調的 Label Encoding 不敏感（以分裂點切分），故未用 One-Hot，避免維度爆炸。</div>`},
+  algo_lr:{title:'Logistic Regression — F1 熱圖',sub:'線性基準線 · 三特徵集的演算法×抽樣矩陣',wide:true,html:`
+    <p>下方三張為各特徵集的 <b>F1 熱圖</b>（直=演算法、橫=抽樣）。LR 為<b>線性基準線</b>，整體最弱，主要作為對照。</p>
+    <div class="ev-imgs">
+      <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>Full_25</figcaption></figure>
+      <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>Behav_15</figcaption></figure>
+      <figure><img src="assets/plots/Core_6feat_f1_grid.png"><figcaption>Core_6</figcaption></figure>
+    </div>`},
+  algo_rf:{title:'Random Forest — F1 熱圖',sub:'袋裝樹 · 抗噪較強',wide:true,html:`
+    <p>RF 以多棵決策樹投票，<b>抗噪較強</b>、不易過擬合，但在本資料略遜 XGBoost。</p>
+    <div class="ev-imgs">
+      <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>Full_25</figcaption></figure>
+      <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>Behav_15</figcaption></figure>
+      <figure><img src="assets/plots/Core_6feat_f1_grid.png"><figcaption>Core_6</figcaption></figure>
+    </div>`},
+  algo_xgb:{title:'XGBoost — F1 熱圖 + 混淆矩陣',sub:'梯度提升 · 三特徵集全數奪冠 🏆',wide:true,html:`
+    <p>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數最佳</b>（Full_25=0.687 / Behav_15=0.680 / Core_6=0.608）。</p>
+    <div class="ev-imgs">
+      <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>F1 熱圖 · Full_25</figcaption></figure>
+      <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>F1 熱圖 · Behav_15</figcaption></figure>
+      <figure><img src="assets/plots/Core_6feat_f1_grid.png"><figcaption>F1 熱圖 · Core_6</figcaption></figure>
+    </div>
+    <div class="ev-imgs">
+      <figure><img src="assets/plots/Full_25feat_confusion.png"><figcaption>混淆矩陣 · Full_25</figcaption></figure>
+      <figure><img src="assets/plots/Behav_15feat_confusion.png"><figcaption>混淆矩陣 · Behav_15</figcaption></figure>
+      <figure><img src="assets/plots/Core_6feat_confusion.png"><figcaption>混淆矩陣 · Core_6</figcaption></figure>
+    </div>`},
+  v1:{title:'v1 — Kaggle obesity_level',sub:'2,111 筆 · 合成資料',html:`
+    <p>來源：Kaggle「Obesity Levels」資料集，以 SMOTE 從少量真實樣本<b>合成</b>放大到 2,111 筆。</p>
+    <table class="ev-table"><tbody>
+      <tr><th>筆數</th><td>2,111（合成）</td></tr><tr><th>特徵</th><td>約 17 欄</td></tr><tr><th>目標</th><td>7 級 BMI 分類</td></tr></tbody></table>
+    <div class="ev-note">❌ 放棄主因：合成資料的 BMI 邊界<b>不符 WHO 標準</b>，且小資料 + 深度學習嚴重過擬合，無法外推真實族群。</div>
+    <div class="ev-good">✅ 收穫：建立第一版 FastAPI 部署流程與 EDA 範本。</div>`},
+  v2:{title:'v2 — Kaggle heart_2020_cleaned',sub:'320k 筆 · BRFSS 2020 第三方清洗版',html:`
+    <p>來源：Kaggle 釋出的 <b>BRFSS 2020 第三方清洗版</b>（原為心臟病導向）。資料量夠大，但被別人預處理過。</p>
+    <table class="ev-table"><tbody>
+      <tr><th>筆數</th><td>約 320,000</td></tr><tr><th>特徵</th><td>僅 18 欄</td></tr><tr><th>年份</th><td>2020（COVID 首年）</td></tr></tbody></table>
+    <div class="ev-note">❌ 放棄主因：① 第三方預處理只剩 <b>18 欄</b>，丟失原始變數 ② 2020 行為受疫情扭曲 ③ <b>無 SLEPTIM1 睡眠</b>變數。</div>
+    <div class="ev-good">✅ 收穫：確立 3 特徵集 × 3 演算法 × 3 抽樣 = 27 模型 的實驗框架。</div>`},
+  v3:{title:'v3 — CDC BRFSS 2022 原始 XPT ✅',sub:'445,132 → 329,126 筆 · 官方原始',html:`
+    <p>回歸 <b>CDC 官方原始 SAS Transport（.XPT）</b>，自己做 ETL，掌握每一個編碼決策。</p>
+    <table class="ev-table"><tbody>
+      <tr><th>原始</th><td class="hl">445,132 筆 × 328 變數</td></tr><tr><th>清理後</th><td class="hl">329,126 筆 × 26 欄</td></tr><tr><th>特徵集</th><td>Full_25 / Behav_15 / Core_6</td></tr></tbody></table>
+    <div class="ev-good">✅ 採用主因：官方原始、328 變數自由選、含睡眠、可設計三層階梯特徵集。最佳 Binary F1 = <b>0.687</b>。</div>`}
+};
+let modalOpen=false, currentKey=null, lastOrigin=null;
+const modalEl=document.getElementById('modal'), modalCard=document.getElementById('modalCard');
+
+function openModalFromEl(key, el){
+  const m=MODALS[key]; if(!m) return;
+  currentKey=key;
+  modalCard.className='modal-card'+(m.wide?' wide':'');
+  modalCard.innerHTML=`<span class="mclose">×</span><h3>${m.title}</h3><div class="msub">${m.sub}</div>${m.html}`;
+  modalEl.classList.add('open'); modalOpen=true;
+  modalCard.querySelector('.mclose').addEventListener('click',(e)=>{e.stopPropagation();closeModal();});
+  // zoom out from the clicked element's position
+  gsap.set(modalCard,{clearProps:'transform,opacity'});
+  const cr=el.getBoundingClientRect(), fr=modalCard.getBoundingClientRect();
+  const dx=(cr.left+cr.width/2)-(fr.left+fr.width/2);
+  const dy=(cr.top+cr.height/2)-(fr.top+fr.height/2);
+  const sc=Math.min(0.55, Math.max(cr.width/fr.width, 0.12));
+  lastOrigin={dx,dy,sc};
+  gsap.fromTo(modalCard,{x:dx,y:dy,scale:sc,opacity:0},{x:0,y:0,scale:1,opacity:1,duration:.42,ease:'power3.out'});
+}
+function closeModal(){
+  if(!modalOpen) return;
+  const o=lastOrigin||{dx:0,dy:0,sc:.2};
+  gsap.to(modalCard,{x:o.dx,y:o.dy,scale:o.sc,opacity:0,duration:.3,ease:'power3.in',
+    onComplete:()=>{ modalEl.classList.remove('open'); modalOpen=false; currentKey=null; gsap.set(modalCard,{clearProps:'all'}); }});
+}
+modalEl.addEventListener('click',(e)=>{ if(e.target===modalEl) closeModal(); });
+function bindClickables(){
+  document.querySelectorAll('.clk[data-modal]').forEach(el=>{
+    if(el._mbound) return; el._mbound=true;
+    el.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      if(modalOpen && currentKey===el.dataset.modal){ closeModal(); }
+      else { openModalFromEl(el.dataset.modal, el); }
+    });
+  });
+}
+bindClickables();
+
+const CORE6_PAYLOAD={sleep_hours:7,smoking_status:4,drank_any:0,drinks_per_week:0,exercised:0,general_health:4};
+const demoBtn=document.getElementById('demoBtn');
+demoBtn?.addEventListener('click',async()=>{
+  const st=document.getElementById('demoStatus'),pct=document.getElementById('demoPct'),arc=document.getElementById('gaugeArc');
+  demoBtn.disabled=true; st.textContent='呼叫 API 中…（冷啟動可能 30–60 秒）';
+  try{
+    const c=new AbortController(); const tid=setTimeout(()=>c.abort(),90000);
+    const r=await fetch(API_BASE+'/predict/core6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(CORE6_PAYLOAD),signal:c.signal});
+    clearTimeout(tid); if(!r.ok)throw new Error('HTTP '+r.status);
+    const res=await r.json(); const p=res.probability.overweight_obese; const o={v:0};
+    gsap.to(o,{v:p*100,duration:1.1,ease:'power2.out',onUpdate:()=>pct.textContent=o.v.toFixed(1)+'%'});
+    arc.style.strokeDashoffset=251.3*(1-p);
+    arc.style.stroke=p<0.35?'#10b981':p<0.65?'#f59e0b':'#ef4444';
+    st.textContent='模型判斷：'+res.label+'（此情境：少運動、自評健康差 → 高風險）';
+  }catch(err){ st.textContent='❌ '+err.message+'　可改用備援截圖'; }
+  finally{ demoBtn.disabled=false; }
+});
+
+window.addEventListener('load',()=>{
+  try{ new QRCode(document.getElementById('qrcode'),{text:DEMO_URL,width:190,height:190,colorDark:'#0b1120',colorLight:'#ffffff'}); }catch(e){}
+  fetch(API_BASE+'/',{method:'GET'}).catch(()=>{});
+  const h=parseInt((location.hash||'').replace('#',''),10);
+  go(Number.isFinite(h)&&h>=1&&h<=slides.length ? h-1 : 0);
+});
+</script>
+</body>
+</html>
