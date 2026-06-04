@@ -184,6 +184,12 @@
   .lc-data td:first-child,.lc-data th:first-child{text-align:left;}
   .lc-data .up{color:#fca5a5; font-weight:700;} .lc-data .dn{color:var(--green2); font-weight:700;}
   .lc-cap{margin:12px auto 0; color:var(--muted); font-size:clamp(11px,1.2vw,13px); max-width:880px; text-align:center; line-height:1.6;}
+  .lc-btn{cursor:pointer; padding:5px 14px; border:1px solid var(--line); border-radius:999px; color:var(--ink); transition:.15s;}
+  .lc-btn:hover{border-color:var(--blue2); background:rgba(96,165,250,.1); transform:translateY(-1px);}
+  .wkgrid{display:grid; grid-template-columns:repeat(8,1fr); gap:8px; margin:14px 0;}
+  .wk{border:1.5px solid; border-radius:8px; padding:7px 4px; text-align:center; background:rgba(255,255,255,.03);}
+  .wk .wkn{display:block; font-size:11px; color:var(--muted);}
+  .wk .wkv{display:block; font-size:clamp(13px,1.5vw,16px); font-weight:800; font-variant-numeric:tabular-nums;}
 
   /* clickable evidence cards + modal */
   .card-i.clk{cursor:pointer; transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; position:relative;}
@@ -516,26 +522,15 @@
 
 <!-- 17 DYNAMIC TRACKING -->
 <section class="slide" data-slide="m17">
-  <div class="head"><h2 data-anim>動態追蹤：<span class="k">4 行為情境 × 16 週（Core_6）</span></h2>
-  <div class="lead" data-anim>實線＝趨勢方向 ｜ 圓點＝模型<b>逐週真實輸出</b></div></div>
+  <div class="head"><h2 data-anim>動態追蹤：<span class="k">改善 vs 惡化 × 16 週（Core_6）</span></h2>
+  <div class="lead" data-anim>實線＝趨勢 ｜ 圓點＝模型逐週真實輸出（即 API /predict/core6 結果）｜ <span class="accent">點按鈕看 16 週明細</span></div></div>
   <div class="lc-wrap">
     <svg id="lc" viewBox="0 0 920 300" style="width:100%; max-width:900px; height:auto;"></svg>
     <div class="lc-legend" data-anim>
-      <span><i style="background:#34d399"></i>改善 58→32</span>
-      <span><i style="background:#ef4444"></i>惡化 32→38</span>
-      <span><i style="background:#60a5fa"></i>穩定·健康 7</span>
-      <span><i style="background:#f59e0b"></i>穩定·高風險 38</span>
+      <span class="clk lc-btn" data-modal="improve16"><i style="background:#34d399"></i>🟢 改善 58→32 ·<b style="color:var(--blue2)">看 16 週明細</b></span>
+      <span class="clk lc-btn" data-modal="worsen16"><i style="background:#ef4444"></i>🔴 惡化 32→38 ·<b style="color:var(--blue2)">看 16 週明細</b></span>
     </div>
-    <table class="lc-data" data-anim>
-      <thead><tr><th>行為情境</th><th>起 W1</th><th>末 W16</th><th>淨變化</th><th>逐週區間 (min–max)</th></tr></thead>
-      <tbody>
-        <tr><td><i style="color:#34d399">●</i> 改善</td><td>58.0%</td><td>32.0%</td><td class="dn">−26.0</td><td>4.7% – 67.6%</td></tr>
-        <tr><td><i style="color:#ef4444">●</i> 惡化</td><td>32.0%</td><td>38.4%</td><td class="up">+6.4</td><td>4.7% – 67.6%</td></tr>
-        <tr><td><i style="color:#60a5fa">●</i> 穩定·健康</td><td>7.2%</td><td>7.2%</td><td>0</td><td>7.2%（持平）</td></tr>
-        <tr><td><i style="color:#f59e0b">●</i> 穩定·高風險</td><td>37.7%</td><td>37.7%</td><td>0</td><td>37.7%（持平）</td></tr>
-      </tbody>
-    </table>
-    <div class="lc-cap" data-anim>逐週在 <b>4.7%–67.6%</b> 劇烈震盪，淨變化卻僅 −26 / +6 → 截面模型<b>無時間概念</b>，逐週為雜訊、只有起訖趨勢可信（呼應下頁 Discussion）。<span style="opacity:.7">註：Core_6 僅看行為，故改善男=改善女、惡化男=惡化女。</span></div>
+    <div class="lc-cap" data-anim>逐週在 <b>4.7%–67.6%</b> 劇烈震盪，淨變化卻僅 −26 / +6 → 截面模型<b>無時間概念</b>，逐週為雜訊、只有起訖趨勢可信（呼應下頁 Discussion）。</div>
   </div>
 </section>
 
@@ -686,8 +681,7 @@ function drawLineChart(){
   // 真實逐週 Core_6 機率（本機模型輸出，W1..W16）
   const IMP=[58.0,37.4,39.9,62.7,67.6,63.3,5.2,5.2,60.1,50.7,5.3,4.7,40.3,27.6,32.0,32.0];
   const WOR=[32.0,27.6,5.0,4.7,39.5,62.1,13.4,11.5,67.6,60.5,48.1,39.9,51.5,37.4,59.1,38.4];
-  const FLAT=v=>Array(16).fill(v);
-  const lines=[{c:'#34d399',d:series(58,32),real:IMP},{c:'#ef4444',d:series(32,38),real:WOR},{c:'#60a5fa',d:series(7,7),real:FLAT(7.2)},{c:'#f59e0b',d:series(37.7,37.7),real:FLAT(37.7)}];
+  const lines=[{c:'#34d399',d:series(58,32),real:IMP},{c:'#ef4444',d:series(32,38),real:WOR}];
   const NS='http://www.w3.org/2000/svg'; svg.innerHTML='';
   for(let p=0;p<=70;p+=10){
     const ln=document.createElementNS(NS,'line');
@@ -844,6 +838,18 @@ const MODALS={
     </div>
     <div class="ev-good">✅ 採用主因：官方原始、328 變數自由選、含睡眠、可設計三層階梯特徵集。最佳 Binary F1 = <b>0.687</b>。</div>`}
 };
+/* 動態追蹤：改善/惡化 16 週逐週機率 modal（真實 Core_6 = API 輸出，依風險上色）*/
+(function(){
+  const IMP16=[58.0,37.4,39.9,62.7,67.6,63.3,5.2,5.2,60.1,50.7,5.3,4.7,40.3,27.6,32.0,32.0];
+  const WOR16=[32.0,27.6,5.0,4.7,39.5,62.1,13.4,11.5,67.6,60.5,48.1,39.9,51.5,37.4,59.1,38.4];
+  const col=p=> p<35?'#10b981': p<=65?'#f59e0b':'#ef4444';
+  const grid=arr=>'<div class="wkgrid">'+arr.map((p,i)=>`<div class="wk" style="border-color:${col(p)}"><span class="wkn">W${i+1}</span><span class="wkv" style="color:${col(p)}">${p.toFixed(1)}%</span></div>`).join('')+'</div>';
+  const legend='<p>每週模型輸出的<b>過重+肥胖機率</b>（= API /predict/core6）。顏色：<span style="color:#10b981">綠 低 &lt;35%</span> ｜ <span style="color:#f59e0b">黃 邊界 35–65%</span> ｜ <span style="color:#ef4444">紅 高 &gt;65%</span>。</p>';
+  MODALS.improve16={title:'🟢 改善情境 · 16 週逐週機率',sub:'起 58.0% → 末 32.0%（淨 −26）· 同 API /predict/core6',wide:true,
+    html:legend+grid(IMP16)+'<div class="ev-note">行為持續變好，但逐週在 <b>4.7%–67.6%</b> 劇烈震盪 → 截面模型逐週是<b>雜訊</b>，只有起訖趨勢可信。</div>'};
+  MODALS.worsen16={title:'🔴 惡化情境 · 16 週逐週機率',sub:'起 32.0% → 末 38.4%（淨 +6）· 同 API /predict/core6',wide:true,
+    html:legend+grid(WOR16)+'<div class="ev-note">行為持續變差，逐週同樣在 <b>4.7%–67.6%</b> 大幅跳動 → 印證截面資料<b>無時間概念</b>。</div>'};
+})();
 let modalOpen=false, currentKey=null, lastOrigin=null;
 const modalEl=document.getElementById('modal'), modalCard=document.getElementById('modalCard');
 const zoomLayer=document.getElementById('imgZoom'), zoomImg=zoomLayer.querySelector('img');
