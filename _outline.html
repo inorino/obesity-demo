@@ -118,15 +118,22 @@
     <div class="ttl">特徵集設計：<span class="k">三層階梯式消除</span></div>
     <ul><li>Core_6 ⊂ Behav_15 ⊂ Full_25 + 金字塔圖</li></ul>
   </div>
-  <div class="card">
-    <span class="num">8</span><span class="tag">EXPERIMENT</span>
-    <div class="ttl">27 組實驗矩陣：3 特徵集 × 3 演算法 × 3 抽樣</div>
-    <ul><li>點演算法看 F1 熱圖 + 混淆矩陣；XGB+SMOTE 全勝</li></ul>
+  <div class="card ok">
+    <span class="num">8</span><span class="tag">分類框架</span>
+    <div class="ttl">兩種分類框架：<span class="k">二元 vs 三類別</span></div>
+    <ul><li>先建立框架：二元普遍高 ~0.19 → 後續以二元為準</li></ul>
+    <div class="note"><span class="chg">調整</span> 移到 27 矩陣【之前】，先講二元/三類別。</div>
   </div>
   <div class="card">
     <span class="num">9</span><span class="tag">EVALUATION</span>
     <div class="ttl">評估方法與指標：<span class="k">公平比較的共同標準</span></div>
     <ul><li>80/20 stratified / Macro F1 / SMOTE 只在訓練集</li></ul>
+  </div>
+  <div class="card ok">
+    <span class="num">10</span><span class="tag">EXPERIMENT</span>
+    <div class="ttl">27 組實驗矩陣：3 特徵集 × 3 演算法 × 3 抽樣</div>
+    <ul><li>LR/RF/XGBoost 全名 + Raw/SMOTE/Under 中文；點演算法看圖（hover 放大）</li></ul>
+    <div class="note"><span class="chg">調整</span> 移到框架／評估之後。</div>
   </div>
 </div>
 
@@ -134,26 +141,23 @@
 <div class="sec">④ 結果</div>
 <div class="grid">
   <div class="card ok">
-    <span class="num">10</span><span class="tag">分類框架</span>
-    <div class="ttl">兩種分類框架：<span class="k">二元 vs 三類別</span></div>
-    <ul><li>二元(Normal vs 過重+肥胖) 普遍高 ~0.19 → 後續以二元為準</li></ul>
-    <div class="note"><span class="chg">調整</span> 移到 F1 總表【之前】，先建立框架。</div>
-  </div>
-  <div class="card ok">
     <span class="num">11</span><span class="tag">RESULTS · F1</span>
     <div class="ttl">結果：F1 成績總表（二元）</div>
     <ul><li>Full_25 0.687 / Behav_15 0.680 / Core_6 0.608</li></ul>
-    <div class="note"><span class="chg">調整</span> 標題加註「二元 Binary」。</div>
   </div>
   <div class="card">
     <span class="num">12</span><span class="tag">KEY FINDING</span>
     <div class="ttl">🔑 關鍵發現：<span class="k">行為勝過慢性病史</span></div>
-    <ul><li>Full_25 − Behav_15 = 差 <1%；Core_6 6 問達 0.608</li></ul>
+    <ul><li>Full_25 − Behav_15 = 差 <1%；Core_6 6 問達 0.608（二元）</li></ul>
   </div>
-  <div class="card">
+  <div class="card ok">
     <span class="num">13</span><span class="tag">IMPORTANCE</span>
-    <div class="ttl">特徵重要度排行（Full_25 · Binary XGBoost）</div>
-    <ul><li>GENHLTH/年齡/氣喘/運動/睡眠/看牙醫；Dental 第6 是亮點</li></ul>
+    <div class="ttl">特徵重要度排行（二元 Binary XGBoost）</div>
+    <ul>
+      <li>改用<b>真實模型值</b>；可切換 Full_25 / Behav_15 / Core_6 三組</li>
+      <li>Full_25 首位＝關節炎；去慢性病後行為升頂；Core_6 自評健康佔 0.42</li>
+    </ul>
+    <div class="note"><span class="chg">調整</span> 修正錯誤標籤、補 15/6 兩組、移除「新」、加數值說明。</div>
   </div>
 </div>
 

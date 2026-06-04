@@ -91,7 +91,7 @@
   .nest.n6{background:rgba(245,158,11,.14); border:1px solid var(--amber); width:58%;}
   .nest .n{font-size:clamp(24px,3vw,38px); font-weight:800; line-height:1;}
 
-  .mtx{display:flex; gap:34px; align-items:center;}
+  .mtx{display:flex; gap:30px; align-items:center; justify-content:center;}
   .mtx-grid{display:grid; grid-template-columns:84px repeat(3,124px); grid-auto-rows:62px; gap:9px;}
   .mcell{border:1px solid var(--line); border-radius:10px; background:var(--card); display:flex;
     align-items:center; justify-content:center; font-size:13px; color:var(--muted); text-align:center; padding:4px;}
@@ -123,6 +123,11 @@
   .ghbar.bin{background:linear-gradient(90deg,#7f1d1d,#b91c1c);}
   .ghbar.tri{background:linear-gradient(90deg,#ea580c,#fb923c);} .ghbar.tri .t{color:#06122b;}
 
+  .imp-tabs{display:flex; gap:10px; margin-bottom:16px;}
+  .imp-tab{font-family:inherit; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--muted);
+    padding:7px 16px; border-radius:999px; font-size:clamp(12px,1.3vw,15px); font-weight:600; transition:.15s;}
+  .imp-tab:hover{border-color:var(--blue2); color:var(--ink);}
+  .imp-tab.active{background:var(--blue2); color:#06122b; border-color:var(--blue2); font-weight:800;}
   .imp{width:min(900px,90vw); display:flex; flex-direction:column; gap:12px;}
   .imp-row{display:grid; grid-template-columns:240px 1fr 60px; align-items:center; gap:16px;}
   .imp-name{text-align:right; font-size:clamp(13px,1.5vw,18px);}
@@ -354,7 +359,36 @@
   </div>
 </section>
 
-<!-- 8 27 MATRIX -->
+<!-- 8 BINARY VS 3CLASS（先建立二元/三類別框架）-->
+<section class="slide" data-slide="m12">
+  <div class="head"><h2 data-anim>兩種分類框架：<span class="k">Binary 二元 vs 3-Class 三類別</span></h2>
+  <div class="lead" data-anim>同一批模型、兩種分法評估。<b>二元</b>＝Normal vs 過重+肥胖；<b>三類別</b>＝Normal / Overweight / Obese。</div></div>
+  <div class="ghc" id="ghc12">
+    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
+      <div class="ghbar bin" data-w="98"><span class="t">二元 Binary F1</span><span class="v">0.6867</span></div>
+      <div class="ghbar tri" data-w="71"><span class="t">三類別 3-Class F1</span><span class="v">0.4955</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
+      <div class="ghbar bin" data-w="97"><span class="t">二元 Binary F1</span><span class="v">0.6800</span></div>
+      <div class="ghbar tri" data-w="69"><span class="t">三類別 3-Class F1</span><span class="v">0.4831</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
+      <div class="ghbar bin" data-w="87"><span class="t">二元 Binary F1</span><span class="v">0.6082</span></div>
+      <div class="ghbar tri" data-w="60"><span class="t">三類別 3-Class F1</span><span class="v">0.4187</span></div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:2vh;">二元普遍比三類別高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。<b class="em-green">故後續實驗與成績皆以二元為準。</b></div>
+</section>
+
+<!-- 9 EVALUATION -->
+<section class="slide" data-slide="m09">
+  <div class="head"><h2 data-anim>評估方法與指標 — <span class="k">公平比較 27 組的共同標準</span></h2></div>
+  <div class="grid g3" style="width:min(1000px,88vw);">
+    <div class="card-i acc-b" data-anim><div class="t">資料切分</div><div class="d"><b>80/20</b> train-test split，<b>stratified</b> 維持各 BMI 類別比例。</div></div>
+    <div class="card-i acc-g" data-anim><div class="t">主指標：Macro F1</div><div class="d">三類不平衡，Accuracy 會被多數類灌水；<b>Macro F1</b> 對少數類更公平。</div></div>
+    <div class="card-i acc-v" data-anim><div class="t">SMOTE 原理</div><div class="d">對少數類在特徵空間「內插」生成合成樣本，<b>只在訓練集做</b>，避免資訊洩漏。</div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
+</section>
+
+<!-- 10 27 MATRIX -->
 <section class="slide" data-slide="m08">
   <div class="head"><h2 data-anim>模型訓練：<span class="k">27 組實驗矩陣</span> — 3 特徵集 × 3 演算法 × 3 抽樣</h2></div>
   <div class="mtx">
@@ -371,41 +405,12 @@
         <div class="mcell lbl">Under<small>降採樣</small></div>
         <div class="mcell">降採樣</div><div class="mcell">—</div><div class="mcell">—</div>
       </div>
-      <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣</div>
+      <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣（結果皆為二元）</div>
     </div>
-    <div style="max-width:300px;">
+    <div style="max-width:250px;">
       <div class="lead" data-anim style="text-align:left;">直欄 = 演算法、橫列 = 抽樣策略。每格 × <b>3 個特徵集</b> = <b class="accent">27 組模型</b>。<br><br>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數奪冠</b>。</div>
     </div>
   </div>
-</section>
-
-<!-- 9 EVALUATION -->
-<section class="slide" data-slide="m09">
-  <div class="head"><h2 data-anim>評估方法與指標 — <span class="k">公平比較 27 組的共同標準</span></h2></div>
-  <div class="grid g3">
-    <div class="card-i acc-b" data-anim><div class="t">資料切分</div><div class="d"><b>80/20</b> train-test split，<b>stratified</b> 維持各 BMI 類別比例。</div></div>
-    <div class="card-i acc-g" data-anim><div class="t">主指標：Macro F1</div><div class="d">三類不平衡，Accuracy 會被多數類灌水；<b>Macro F1</b> 對少數類更公平。</div></div>
-    <div class="card-i acc-v" data-anim><div class="t">SMOTE 原理</div><div class="d">對少數類在特徵空間「內插」生成合成樣本，<b>只在訓練集做</b>，避免資訊洩漏。</div></div>
-  </div>
-  <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
-</section>
-
-<!-- 10 BINARY VS 3CLASS（先講分類框架，再看成績）-->
-<section class="slide" data-slide="m12">
-  <div class="head"><h2 data-anim>兩種分類框架：<span class="k">Binary 二元 vs 3-Class 三類別</span></h2>
-  <div class="lead" data-anim>同一批模型、兩種分法評估。<b>二元</b>＝Normal vs 過重+肥胖；<b>三類別</b>＝Normal / Overweight / Obese。</div></div>
-  <div class="ghc" id="ghc12">
-    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
-      <div class="ghbar bin" data-w="98"><span class="t">二元 Binary F1</span><span class="v">0.6867</span></div>
-      <div class="ghbar tri" data-w="71"><span class="t">三類別 3-Class F1</span><span class="v">0.4955</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
-      <div class="ghbar bin" data-w="97"><span class="t">二元 Binary F1</span><span class="v">0.6800</span></div>
-      <div class="ghbar tri" data-w="69"><span class="t">三類別 3-Class F1</span><span class="v">0.4831</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
-      <div class="ghbar bin" data-w="87"><span class="t">二元 Binary F1</span><span class="v">0.6082</span></div>
-      <div class="ghbar tri" data-w="60"><span class="t">三類別 3-Class F1</span><span class="v">0.4187</span></div></div>
-  </div>
-  <div class="lead" data-anim style="margin-top:2vh;">二元普遍比三類別高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。<b class="em-green">故後續成績總表皆以二元為準。</b></div>
 </section>
 
 <!-- 11 F1 RESULTS BARS（二元）-->
@@ -436,16 +441,15 @@
 
 <!-- 14 IMPORTANCE -->
 <section class="slide" data-slide="m14">
-  <div class="head"><h2 data-anim>特徵重要度排行（Full_25 · 二元 Binary XGBoost）</h2></div>
-  <div class="imp" id="imp14">
-    <div class="imp-row" data-anim><div class="imp-name">自評健康 GENHLTH</div><div class="imp-track"><div class="imp-fill" data-w="100" style="background:linear-gradient(90deg,#7f1d1d,#b91c1c)"></div></div><div class="imp-val">0.120</div></div>
-    <div class="imp-row" data-anim><div class="imp-name">年齡層 Age_Group</div><div class="imp-track"><div class="imp-fill" data-w="92" style="background:linear-gradient(90deg,#9a3412,#c2410c)"></div></div><div class="imp-val">0.110</div></div>
-    <div class="imp-row" data-anim><div class="imp-name">氣喘 Asthma 新</div><div class="imp-track"><div class="imp-fill" data-w="78" style="background:linear-gradient(90deg,#c2410c,#ea580c)"></div></div><div class="imp-val">0.093</div></div>
-    <div class="imp-row" data-anim><div class="imp-name">運動 Physical_Activity</div><div class="imp-track"><div class="imp-fill" data-w="71" style="background:linear-gradient(90deg,#ea580c,#f97316)"></div></div><div class="imp-val">0.085</div></div>
-    <div class="imp-row" data-anim><div class="imp-name">睡眠 Sleep_Hours</div><div class="imp-track"><div class="imp-fill" data-w="67" style="background:linear-gradient(90deg,#f97316,#fb923c)"></div></div><div class="imp-val">0.080</div></div>
-    <div class="imp-row" data-anim><div class="imp-name">看牙醫 Dental_Visit 新</div><div class="imp-track"><div class="imp-fill" data-w="62" style="background:linear-gradient(90deg,#fb923c,#fdba74)"></div></div><div class="imp-val">0.075</div></div>
+  <div class="head"><h2 data-anim>特徵重要度排行<span class="k">（二元 Binary XGBoost）</span></h2>
+  <div class="lead" data-anim>數值＝XGBoost 特徵重要度（各特徵在所有樹分裂中的貢獻佔比，三者各自總和＝1，越高越關鍵）。</div></div>
+  <div class="imp-tabs" data-anim>
+    <button class="imp-tab active" data-imp="full">Full_25（25 特徵）</button>
+    <button class="imp-tab" data-imp="behav">Behav_15（15 特徵）</button>
+    <button class="imp-tab" data-imp="core">Core_6（6 特徵）</button>
   </div>
-  <div class="lead" data-anim style="margin-top:2.4vh;">💡 意外：<b class="em-amber">Dental_Visit（看牙醫）排第 6</b>——定期看牙者健康意識較高，成為肥胖風險的隱性代理變數。</div>
+  <div class="imp" id="imp14"></div>
+  <div class="lead" id="impNote" data-anim style="margin-top:2vh; max-width:920px;"></div>
 </section>
 
 <!-- 15 DEMO STEPS + QR + ILLUSTRATION -->
@@ -636,7 +640,7 @@ const builders={
     gsap.to(o,{v:t,duration:1,ease:'power2.out',delay:.2,onUpdate:()=>v.textContent=o.v.toFixed(4)});});},
   m12(s){gsap.fromTo(s.querySelectorAll('.ghbar'),{width:0},{width:(i,el)=>el.dataset.w+'%',duration:.85,ease:'power2.out',stagger:.08,delay:.2});},
   m13(s){countEls(s);},
-  m14(s){gsap.fromTo(s.querySelectorAll('.imp-fill'),{width:0},{width:(i,el)=>el.dataset.w+'%',duration:.8,ease:'power2.out',stagger:.1,delay:.2});},
+  m14(s){renderImp('full');},
   m17(s){drawLineChart();}
 };
 
@@ -830,6 +834,29 @@ function bindClickables(){
   });
 }
 bindClickables();
+
+/* ===== 特徵重要度（真實值來自 models_binary 的 XGBoost）===== */
+const IMP={
+  full:{rows:[['關節炎 Arthritis',0.1207],['運動 Exercised',0.1105],['氣喘 Asthma',0.0934],['性別 Sex',0.0917],['自評健康 GENHLTH',0.0887],['看牙醫 Dental_Visit',0.0746],['糖尿病 Diabetes',0.0744],['憂鬱 Depression',0.0488]],
+    note:'💡 Full_25 第一名是 <b class="em-amber">關節炎 Arthritis</b>，但前 6 名已有 運動、自評健康、看牙醫 等行為／意識指標；<b>看牙醫排第 6</b> = 健康意識的隱性代理變數。'},
+  behav:{rows:[['運動 Exercised',0.1520],['性別 Sex',0.1460],['自評健康 GENHLTH',0.1438],['行走困難 Diff_Walking',0.1195],['憂鬱 Depression',0.1069],['教育程度 Education',0.0585],['是否飲酒 Drank_Any',0.0537],['吸菸 Smoking_Status',0.0496]],
+    note:'💡 移除慢性病後（Behav_15），<b class="em-green">運動、自評健康、行走困難</b>等行為與功能指標立刻升到最前——行為才是主力。'},
+  core:{rows:[['自評健康 GENHLTH',0.4180],['運動 Exercised',0.2583],['吸菸 Smoking_Status',0.1198],['每週飲酒量 Drinks/wk',0.1195],['睡眠 Sleep_Hours',0.0586],['是否飲酒 Drank_Any',0.0258]],
+    note:'💡 Core_6 中 <b class="em-amber">自評健康一項就佔 0.42</b>、運動 0.26——兩個可改變的行為合計近 <b>68%</b> 重要度。'}
+};
+const IMP_RAMP=[['#7f1d1d','#b91c1c'],['#9a3412','#c2410c'],['#b45309','#d97706'],['#c2410c','#ea580c'],['#ea580c','#f97316'],['#f59e0b','#fbbf24'],['#fb923c','#fdba74'],['#fdba74','#fed7aa']];
+let currentImp='full';
+function renderImp(key){
+  currentImp=key; const set=IMP[key]; const max=set.rows[0][1];
+  document.getElementById('imp14').innerHTML=set.rows.map((r,i)=>{
+    const w=Math.round(r[1]/max*100), g=IMP_RAMP[Math.min(i,IMP_RAMP.length-1)];
+    return `<div class="imp-row"><div class="imp-name">${r[0]}</div><div class="imp-track"><div class="imp-fill" data-w="${w}" style="background:linear-gradient(90deg,${g[0]},${g[1]})"></div></div><div class="imp-val">${r[1].toFixed(3)}</div></div>`;
+  }).join('');
+  document.getElementById('impNote').innerHTML=set.note;
+  document.querySelectorAll('.imp-tab').forEach(b=>b.classList.toggle('active',b.dataset.imp===key));
+  gsap.fromTo('#imp14 .imp-fill',{width:0},{width:(i,el)=>el.dataset.w+'%',duration:.7,ease:'power2.out',stagger:.08});
+}
+document.querySelectorAll('.imp-tab').forEach(b=>b.addEventListener('click',(e)=>{e.stopPropagation(); renderImp(b.dataset.imp);}));
 
 const CORE6_PAYLOAD={sleep_hours:7,smoking_status:4,drank_any:0,drinks_per_week:0,exercised:0,general_health:4};
 const demoBtn=document.getElementById('demoBtn');
