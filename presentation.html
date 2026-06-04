@@ -99,12 +99,13 @@
   .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:17px;
     flex-direction:column; gap:1px;}
   .mcell.lbl small{font-size:12px; font-weight:500; color:var(--muted);}
-  .mcell.algo{cursor:pointer; color:var(--blue2); font-weight:800; background:rgba(96,165,250,.08); border-color:#34507f;
-    transition:transform .15s, box-shadow .15s; flex-direction:column; gap:3px; line-height:1.1;}
+  .mcell.algo{cursor:default; color:var(--blue2); font-weight:800; background:rgba(96,165,250,.08); border-color:#34507f;
+    flex-direction:column; gap:3px; line-height:1.1;}
   .mcell.algo b{font-size:18px;}
   .mcell.algo i{font-style:normal; font-size:10.5px; font-weight:600; color:#8fb4e6; opacity:.9;}
-  .mcell.algo:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); border-color:var(--blue2);}
   .mcell.win{background:linear-gradient(180deg,var(--green),#0e9f74); color:#04231a; font-weight:800; border-color:var(--green2);}
+  .mcell.win.clk{cursor:pointer; transition:transform .15s, box-shadow .15s;}
+  .mcell.win.clk:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,.4);}
   .mtx-hint{color:#33436e; font-size:12px; margin-top:14px; text-align:center;}
 
   .chart{display:flex; gap:64px; align-items:flex-end; justify-content:center; height:46vh; padding-top:54px;}
@@ -274,7 +275,7 @@
       <span class="tag">BRFSS 2022</span><span class="tag">XGBOOST + SMOTE</span><span class="tag">BEHAVIORAL PUBLIC HEALTH</span>
     </div>
   </div>
-  <div class="col-photo" data-anim><img src="assets/img/s01_hero.png" alt=""></div>
+  <div class="col-photo" data-anim><img src="assets/img/cover_hero.png" alt=""></div>
   <div style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); display:flex; gap:26px;">
     <a href="#15" onclick="go(14);return false;" title="Demo" style="font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">▶ demo</a>
     <a href="_outline.html" target="_blank" title="大綱" style="font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">⊞ outline</a>
@@ -402,17 +403,17 @@
     <div>
       <div class="mtx-grid" id="mtx27">
         <div class="mcell lbl"></div>
-        <div class="mcell algo clk" data-modal="algo_lr"><b>LR</b><i>Logistic Regression</i></div>
-        <div class="mcell algo clk" data-modal="algo_rf"><b>RF</b><i>Random Forest</i></div>
-        <div class="mcell algo clk" data-modal="algo_xgb"><b>XGBoost</b><i>Gradient Boosting</i></div>
+        <div class="mcell algo"><b>LR</b><i>Logistic Regression</i></div>
+        <div class="mcell algo"><b>RF</b><i>Random Forest</i></div>
+        <div class="mcell algo"><b>XGBoost</b><i>Gradient Boosting</i></div>
         <div class="mcell lbl">Raw<small>原始</small></div>
         <div class="mcell">基準線</div><div class="mcell">抗噪較強</div><div class="mcell">對照組</div>
         <div class="mcell lbl">SMOTE<small>過採樣</small></div>
-        <div class="mcell">補少數類</div><div class="mcell">抗過擬合</div><div class="mcell win">🏆 最佳</div>
-        <div class="mcell lbl">Under<small>降採樣</small></div>
-        <div class="mcell">降採樣</div><div class="mcell">—</div><div class="mcell">—</div>
+        <div class="mcell">補足少數類</div><div class="mcell">抗過擬合</div><div class="mcell win clk" data-modal="best">🏆 最佳</div>
+        <div class="mcell lbl">Under-sampling<small>降採樣</small></div>
+        <div class="mcell">資訊損失</div><div class="mcell">損失較小</div><div class="mcell">速度快</div>
       </div>
-      <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣（結果皆為二元）</div>
+      <div class="mtx-hint">🔍 點 🏆 最佳格 → 看三個特徵集的 F1 熱圖與混淆矩陣（皆為二元）</div>
     </div>
     <div style="max-width:300px;">
       <div class="lead" data-anim style="text-align:left;">直欄 = 演算法、橫列 = 抽樣策略。每格 × <b>3 個特徵集</b> = <b class="accent">27 組模型</b>。<br><br>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數奪冠</b>。</div>
@@ -735,22 +736,8 @@ const MODALS={
     <p><b>連續特徵（保留原值）</b>：sleep_hours（睡眠時數）、drinks_per_week（每週飲酒量）、mental_health_days（心理不適天數）、physical_health_days（身體不適天數）。樹模型可直接吃數值。</p>
     <p><b>類別特徵（Label Encoding）</b>：smoking_status（吸菸狀態）、general_health（自評健康）、age_group（年齡層）、education（教育程度）、income（收入）、employment（就業狀態）、sex（性別）、diff_walking（行走困難）… 轉成整數類別碼。</p>
     <div class="ev-good">✅ XGBoost / RF 對單調的 Label Encoding 不敏感（以分裂點切分），故未用 One-Hot，避免維度爆炸。</div>`},
-  algo_lr:{title:'Logistic Regression — F1 熱圖',sub:'線性基準線 · 三特徵集的演算法×抽樣矩陣',wide:true,html:`
-    <p>下方三張為各特徵集的 <b>F1 熱圖</b>（直=演算法、橫=抽樣）。LR 為<b>線性基準線</b>，整體最弱，主要作為對照。</p>
-    <div class="ev-imgs">
-      <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>Full_25</figcaption></figure>
-      <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>Behav_15</figcaption></figure>
-      <figure><img src="assets/plots/Core_6feat_f1_grid.png"><figcaption>Core_6</figcaption></figure>
-    </div>`},
-  algo_rf:{title:'Random Forest — F1 熱圖',sub:'袋裝樹 · 抗噪較強',wide:true,html:`
-    <p>RF 以多棵決策樹投票，<b>抗噪較強</b>、不易過擬合，但在本資料略遜 XGBoost。</p>
-    <div class="ev-imgs">
-      <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>Full_25</figcaption></figure>
-      <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>Behav_15</figcaption></figure>
-      <figure><img src="assets/plots/Core_6feat_f1_grid.png"><figcaption>Core_6</figcaption></figure>
-    </div>`},
-  algo_xgb:{title:'XGBoost — F1 熱圖 + 混淆矩陣',sub:'梯度提升 · 三特徵集全數奪冠 🏆',wide:true,html:`
-    <p>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數最佳</b>（Full_25=0.687 / Behav_15=0.680 / Core_6=0.608）。</p>
+  best:{title:'🏆 最佳組合：XGBoost + SMOTE',sub:'F1 熱圖（3×3 全貌）＋ 混淆矩陣 · 皆為二元',wide:true,html:`
+    <p>27 組中 <b class="em-green">XGBoost + SMOTE</b> 在三個特徵集<b>全數奪冠</b>（Full_25=0.687 / Behav_15=0.680 / Core_6=0.608）。下方每張 F1 熱圖即該特徵集「3 演算法 × 3 抽樣」的完整成績，右下角 XGBoost×SMOTE 為最佳格。</p>
     <div class="ev-imgs">
       <figure><img src="assets/plots/Full_25feat_f1_grid.png"><figcaption>F1 熱圖 · Full_25</figcaption></figure>
       <figure><img src="assets/plots/Behav_15feat_f1_grid.png"><figcaption>F1 熱圖 · Behav_15</figcaption></figure>
