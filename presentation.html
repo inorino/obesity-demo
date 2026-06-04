@@ -212,6 +212,18 @@
   .cc .ct{font-size:clamp(15px,1.7vw,21px);} .cc .cd{color:var(--muted); font-size:clamp(12px,1.3vw,15px); margin-top:3px;}
   .res-row{display:flex; gap:20px; flex-wrap:wrap; margin-top:18px; color:var(--muted); font-size:13px;}
   .res-row b{color:var(--blue2);}
+  .cc-mini{flex:1 1 0; min-width:200px; max-width:340px; display:flex; gap:11px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--line); border-radius:13px; padding:12px 15px;}
+  .cc-mini .ccn{flex:none; width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:16px; background:rgba(255,255,255,.05);}
+  .cc-mini b{font-size:clamp(13px,1.4vw,17px);}
+  .cc-mini .ccd{color:var(--muted); font-size:clamp(11px,1.2vw,13.5px); margin-top:3px; line-height:1.45;}
+  .src{display:flex; flex-direction:column; gap:11px; margin-top:8px;}
+  .src-i{border-left:2px solid var(--line); padding:3px 0 3px 12px; line-height:1.4;}
+  .src-i b{display:block; color:#fff; font-size:clamp(13px,1.4vw,16px);}
+  .src-i span{display:block; color:var(--muted); font-size:clamp(11px,1.2vw,13.5px); margin-top:3px;}
+  .src-i i{color:var(--blue2); font-style:italic;}
+  .src-i.win{border-left-color:var(--green2);} .src-i.win b{color:var(--green2);}
 </style>
 </head>
 <body>
@@ -233,7 +245,10 @@
     </div>
   </div>
   <div class="col-photo" data-anim><img src="assets/img/s01_hero.png" alt=""></div>
-  <a href="#16" onclick="go(15);return false;" title="Demo" style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">▶ demo</a>
+  <div style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); display:flex; gap:26px;">
+    <a href="#15" onclick="go(14);return false;" title="Demo" style="font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">▶ demo</a>
+    <a href="_outline.html" target="_blank" title="大綱" style="font-size:11px; letter-spacing:2px; color:var(--muted); opacity:.18; text-decoration:none; transition:opacity .3s;" onmouseover="this.style.opacity=.7" onmouseout="this.style.opacity=.18">⊞ outline</a>
+  </div>
 </section>
 
 <!-- 2 MOTIVATION -->
@@ -356,20 +371,6 @@
   <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
 </section>
 
-<!-- 10 CONTRIBUTION -->
-<section class="slide split" data-slide="m10">
-  <div class="col-main">
-    <div class="head"><h2 data-anim>研究貢獻與展望</h2></div>
-    <div class="grid g2">
-      <div class="card-i acc-g" data-anim><div class="t">🎯 主要發現</div><div class="d">僅 6 項純行為，XGBoost+SMOTE 即達實用水準，無需病史。</div></div>
-      <div class="card-i acc-b" data-anim><div class="t">📋 公衛意涵</div><div class="d">行為為領先指標，可作低成本早期預警，適用社區健康促進。</div></div>
-      <div class="card-i acc-v" data-anim><div class="t">🔬 方法貢獻</div><div class="d">三層特徵集量化每類變數的預測貢獻，可解釋。</div></div>
-      <div class="card-i acc-a" data-anim><div class="t">🚀 未來方向</div><div class="d">納入縱貫資料、整合穿戴裝置，朝動態個人化評估。</div></div>
-    </div>
-  </div>
-  <div class="col-photo" data-anim><img src="assets/img/s10_hero.png" alt=""></div>
-</section>
-
 <!-- 11 F1 RESULTS BARS -->
 <section class="slide split" data-slide="m11">
   <div class="col-main">
@@ -480,16 +481,21 @@
   </div>
 </section>
 
-<!-- 18 DISCUSSION + DIAGRAM -->
+<!-- 18 DISCUSSION + CONCLUSION -->
 <section class="slide" data-slide="m18">
-  <div class="head"><h2 data-anim>Discussion：<span class="k">截面資料的根本限制</span></h2></div>
-  <div class="row2">
-    <div class="half" style="flex-direction:column; align-items:stretch; gap:14px; display:flex;">
+  <div class="head"><h2 data-anim>Discussion ＋ 結論<span class="k"> · 截面資料的限制與總結</span></h2></div>
+  <div class="row2" style="align-items:flex-start;">
+    <div class="half" style="flex-direction:column; align-items:stretch; gap:12px; display:flex;">
       <div class="card-i acc-a" data-anim><div class="t">觀察到的異常</div><div class="d">男性行為全部改善時，Core_6 機率<b class="em-green">正確下降</b>，但 Behav_15 卻從 <b>50% 升到 72%</b>。</div></div>
       <div class="card-i acc-v" data-anim><div class="t">原因解析</div><div class="d">sex=1（男）+ age_group=6（中年）是<b>強錨點</b>；截面非縱向，模型學到「中年男性群體風險偏高」，無法捕捉個人縱向改變。</div></div>
       <div class="lead" data-anim style="text-align:left;"><b class="em-green">Core_6 無人口錨定，方向反而更穩定。</b></div>
     </div>
-    <div class="half" data-anim><div class="imgcard" style="max-width:430px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
+    <div class="half" data-anim><div class="imgcard" style="max-width:360px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
+  </div>
+  <div class="concl-strip" data-anim style="display:flex; gap:14px; margin-top:2.6vh; width:min(1080px,92vw); justify-content:center; flex-wrap:wrap;">
+    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是 v3 成功的關鍵。</div></div></div>
+    <div class="cc-mini"><span class="ccn em-green">2</span><div><b>行為足以預測肥胖</b><div class="ccd">6 問達 F1=0.608；15 變數 0.680，僅低全特徵 1%。</div></div></div>
+    <div class="cc-mini"><span class="ccn em-amber">3</span><div><b>截面模型有其限制</b><div class="ccd">跨個人預測穩定，縱向敏感度受限，留待未來。</div></div></div>
   </div>
 </section>
 
@@ -506,18 +512,44 @@
   <div class="col-photo" data-anim><img src="assets/img/s19_hero.png" alt=""></div>
 </section>
 
-<!-- 20 CONCLUSION -->
+<!-- 20 END + ACKNOWLEDGEMENT -->
 <section class="slide" data-slide="m20">
-  <div class="head"><h2 data-anim>結論 · Q&amp;A · 致謝</h2></div>
-  <div class="concl">
-    <div class="cc" data-anim><div class="num accent">1</div><div><div class="ct">資料為王</div><div class="cd">回歸 CDC 原始 XPT，是 v3 成功的關鍵。</div></div></div>
-    <div class="cc" data-anim><div class="num em-green">2</div><div><div class="ct">行為足以預測肥胖</div><div class="cd">6 問達 F1=0.608；15 變數達 0.680，僅比全特徵低 1%。</div></div></div>
-    <div class="cc" data-anim><div class="num em-amber">3</div><div><div class="ct">截面模型有其限制</div><div class="cd">跨個人預測穩定，縱向敏感度受限，是未來研究契機。</div></div></div>
+  <div data-anim style="text-align:center;">
+    <div class="sub" style="letter-spacing:6px; margin-bottom:20px;">機器學習期末報告 · 第五組</div>
+    <h1>Thank You<span class="accent">.</span></h1>
+    <div class="lead" data-anim style="margin-top:18px; font-size:clamp(16px,2.2vw,26px);">謝謝聆聽 — 歡迎提問 Q &amp; A</div>
+    <div class="lead" data-anim style="margin-top:30px; max-width:700px; margin-left:auto; margin-right:auto;">致謝：感謝授課教師與助教的悉心指導，以及組員 <b>賴百擎</b> · <b>陳宗傑</b> 的協作。</div>
   </div>
-  <div class="res-row" data-anim>
-    <span>🔗 Demo 互動網站（掃 QR）</span><span>API：<b>obesity-api-2-2ro4.onrender.com/docs</b></span><span>GitHub：<b>github.com/inorino/obesity-api-2</b></span>
+</section>
+
+<!-- 21 SOURCES / REFERENCES（最後一頁） -->
+<section class="slide" data-slide="m21">
+  <div class="head"><h2 data-anim>資料與資源來源 · <span class="k">References</span></h2></div>
+  <div class="grid g3" style="width:min(1180px,93vw); align-items:start;">
+    <div class="card-i acc-b" data-anim>
+      <div class="t">📂 資料集演進</div>
+      <div class="src">
+        <div class="src-i"><b>v1 · Kaggle — Obesity Levels</b><span>2,111 筆（合成資料）· 已棄用</span></div>
+        <div class="src-i"><b>v2 · Kaggle — heart_2020_cleaned</b><span>BRFSS 2020 第三方清洗版 · 320k · 已棄用</span></div>
+        <div class="src-i win"><b>v3 ✅ · CDC BRFSS 2022 原始 XPT</b><span>445k → 329k 筆 · cdc.gov/brfss</span></div>
+      </div>
+    </div>
+    <div class="card-i acc-v" data-anim>
+      <div class="t">📚 學術文獻</div>
+      <div class="src">
+        <div class="src-i"><b>Jastreboff AM, et al. (2022)</b><span>Tirzepatide Once Weekly for the Treatment of Obesity. <i>N Engl J Med</i> 387(3):205–216 · SURMOUNT-1（−20.9%）</span></div>
+        <div class="src-i"><b>Wilding JPH, et al. (2021)</b><span>Once-Weekly Semaglutide in Adults with Overweight or Obesity. <i>N Engl J Med</i> 384(11):989–1002 · STEP-1（−14.9%）</span></div>
+      </div>
+    </div>
+    <div class="card-i acc-g" data-anim>
+      <div class="t">🔗 專案資源</div>
+      <div class="src">
+        <div class="src-i"><b>Demo 互動網站（掃 QR）</b><span>inorino.github.io/obesity-demo</span></div>
+        <div class="src-i"><b>API ＋ Swagger 文件</b><span>obesity-api-2-2ro4.onrender.com/docs</span></div>
+        <div class="src-i"><b>GitHub 原始碼</b><span>github.com/inorino/obesity-api-2</span></div>
+      </div>
+    </div>
   </div>
-  <div class="res-row" data-anim style="font-size:12px;">📚 Jastreboff et al. (2022) Tirzepatide, NEJM 387(3) · Wilding et al. (2021) Semaglutide, NEJM 384(11)</div>
 </section>
 
 <!-- evidence modal -->

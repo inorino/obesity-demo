@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>簡報大綱 · 第五組</title>
+<style>
+  :root{
+    --bg:#0b1120; --bg2:#111a2e; --card:#16213e; --line:#27304d;
+    --txt:#e5ecff; --muted:#8a97bd; --accent:#60a5fa; --blue2:#3b82f6;
+    --green:#34d399; --amber:#fbbf24; --red:#f87171; --violet:#a78bfa;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif;
+    background:linear-gradient(160deg,#0b1120,#0e1730); color:var(--txt); padding:32px 28px 80px;}
+  h1{font-size:24px; margin:0 0 4px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:24px;}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-bottom:28px;
+    background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:12px 16px;}
+  .legend b{color:var(--txt);}
+  .chg{display:inline-block; background:rgba(52,211,153,.14); color:var(--green);
+    border:1px solid rgba(52,211,153,.4); border-radius:6px; padding:1px 7px; font-size:11px; font-weight:600;}
+  .newp{display:inline-block; background:rgba(167,139,250,.16); color:var(--violet);
+    border:1px solid rgba(167,139,250,.4); border-radius:6px; padding:1px 7px; font-size:11px; font-weight:600;}
+
+  .sec{margin:30px 0 12px; font-size:13px; letter-spacing:2px; color:var(--accent);
+    border-left:3px solid var(--accent); padding-left:10px; text-transform:uppercase;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:14px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+    position:relative; transition:.2s;}
+  .card:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .card.ok{border-color:rgba(52,211,153,.4);}
+  .num{position:absolute; top:-10px; left:14px; background:var(--blue2); color:#fff;
+    font-size:12px; font-weight:700; border-radius:6px; padding:2px 9px;}
+  .tag{font-size:10px; letter-spacing:1px; color:var(--muted); float:right;}
+  .ttl{font-size:15px; font-weight:700; margin:10px 0 8px; line-height:1.4;}
+  .ttl .k{color:var(--green);}
+  ul{margin:0; padding-left:18px;}
+  li{font-size:12.5px; color:#c3cdee; line-height:1.7; margin-bottom:2px;}
+  .note{margin-top:10px; padding:8px 10px; background:rgba(52,211,153,.08);
+    border-left:3px solid var(--green); border-radius:6px; font-size:12px; color:#bfeede; line-height:1.6;}
+  .panel{background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:18px 22px; margin-top:36px;}
+  .panel h2{font-size:17px; margin:0 0 12px; color:var(--accent);}
+  .panel ul{padding-left:20px;} .panel li{font-size:13px; margin-bottom:7px; color:#d3dcf5;}
+  .panel li b{color:var(--green);}
+  .backbar{position:sticky; top:-32px; z-index:10; margin:-32px -28px 18px; padding:12px 28px;
+    background:rgba(11,17,32,.85); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .backbar a{color:var(--accent); text-decoration:none; font-size:13px; font-weight:600;}
+  .backbar a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+
+<div class="backbar"><a href="presentation.html">← 返回簡報</a></div>
+
+<h1>📋 簡報結構大綱（已重排）</h1>
+<div class="sub">目前 20 頁。本頁是簡報的目錄/總覽，也是改版紀錄。最新一輪調整見最下方。</div>
+
+<div class="legend">
+  <span><span class="chg">調整</span> = 本輪有變動的頁</span>
+  <span><span class="newp">新增</span> = 新做的頁</span>
+  <span>每張卡 = 一頁；<b>標題</b>下方是該頁內容重點</span>
+</div>
+
+<!-- ===== 開場 ===== -->
+<div class="sec">① 開場 / 動機</div>
+<div class="grid">
+  <div class="card ok">
+    <span class="num">1</span><span class="tag">COVER</span>
+    <div class="ttl">結合生活指標與行為趨勢之<span class="k">肥胖風險預測模型</span></div>
+    <ul>
+      <li>第五組 · 賴百擎 / 陳宗傑 · 研究問題 pill</li>
+      <li>標籤：BRFSS 2022 / XGBoost+SMOTE</li>
+    </ul>
+    <div class="note"><span class="chg">調整</span> 底部隱藏鈕現在有兩顆：<b>▶ demo</b>（跳第15頁）＋ <b>⊞ outline</b>（開本頁，可返回簡報）。</div>
+  </div>
+  <div class="card">
+    <span class="num">2</span><span class="tag">MOTIVATION</span>
+    <div class="ttl">動機：從「落後指標 BMI」走向「<span class="k">領先指標 行為</span>」</div>
+    <ul><li>全球肥胖危機 / 行為=領先指標 / 本研究問題</li></ul>
+  </div>
+</div>
+
+<!-- ===== 資料 / ETL ===== -->
+<div class="sec">② 資料來源 與 ETL</div>
+<div class="grid">
+  <div class="card">
+    <span class="num">3</span><span class="tag">ITERATION</span>
+    <div class="ttl">三版本迭代：<span class="k">從失敗中換來的判斷力</span></div>
+    <ul><li>v1 Kaggle 合成❌ / v2 Kaggle 18欄❌ / v3 BRFSS 2022✅（可點看詳情）</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">4</span><span class="tag">DATA SOURCE</span>
+    <div class="ttl">資料來源：<span class="k">CDC BRFSS 2022</span></div>
+    <ul><li>445,132 筆 × 328 變數；選 2022 因有睡眠時數</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">5</span><span class="tag">ETL FUNNEL</span>
+    <div class="ttl">ETL 清理 445,132 → 329,126（保留 73.9%）</div>
+    <ul><li>漏斗圖逐步刪缺值/無效 → 26 欄；過輕重編為正常</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">6</span><span class="tag">ETL DECISIONS</span>
+    <div class="ttl">ETL 關鍵編碼決策</div>
+    <ul><li>88→0天 / 99900→NaN / GENHLTH 反向 / 連續vs類別（皆可點）</li></ul>
+  </div>
+</div>
+
+<!-- ===== 方法 ===== -->
+<div class="sec">③ 方法論</div>
+<div class="grid">
+  <div class="card">
+    <span class="num">7</span><span class="tag">FEATURES</span>
+    <div class="ttl">特徵集設計：<span class="k">三層階梯式消除</span></div>
+    <ul><li>Core_6 ⊂ Behav_15 ⊂ Full_25 + 金字塔圖</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">8</span><span class="tag">EXPERIMENT</span>
+    <div class="ttl">27 組實驗矩陣：3 特徵集 × 3 演算法 × 3 抽樣</div>
+    <ul><li>點演算法看 F1 熱圖 + 混淆矩陣；XGB+SMOTE 全勝</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">9</span><span class="tag">EVALUATION</span>
+    <div class="ttl">評估方法與指標：<span class="k">公平比較的共同標準</span></div>
+    <ul><li>80/20 stratified / Macro F1 / SMOTE 只在訓練集</li></ul>
+  </div>
+</div>
+
+<!-- ===== 結果 ===== -->
+<div class="sec">④ 結果</div>
+<div class="grid">
+  <div class="card">
+    <span class="num">10</span><span class="tag">RESULTS · F1</span>
+    <div class="ttl">結果：F1 成績總表</div>
+    <ul><li>Full_25 0.687 / Behav_15 0.680 / Core_6 0.608</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">11</span><span class="tag">BINARY vs 3-CLASS</span>
+    <div class="ttl">Binary vs 3-Class：<span class="k">分類成績一覽</span></div>
+    <ul><li>Binary 普遍高 ~0.19 → 瓶頸是 Normal/OW 邊界</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">12</span><span class="tag">KEY FINDING</span>
+    <div class="ttl">🔑 關鍵發現：<span class="k">行為勝過慢性病史</span></div>
+    <ul><li>Full_25 − Behav_15 = 差 <1%；Core_6 6 問達 0.608</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">13</span><span class="tag">IMPORTANCE</span>
+    <div class="ttl">特徵重要度排行（Full_25 · Binary XGBoost）</div>
+    <ul><li>GENHLTH/年齡/氣喘/運動/睡眠/看牙醫；Dental 第6 是亮點</li></ul>
+  </div>
+</div>
+
+<!-- ===== Demo ===== -->
+<div class="sec">⑤ 現場 Demo</div>
+<div class="grid">
+  <div class="card">
+    <span class="num">14</span><span class="tag">DEMO INTRO</span>
+    <div class="ttl">🎯 現場互動預測 Demo（步驟說明）</div>
+    <ul><li>4 步驟 + 顏色分級 🟢🟡🔴 + 插圖（保留，雙功能）</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">15</span><span class="tag">DEMO LIVE</span>
+    <div class="ttl">🎯 現場 Demo — <span class="k">掃 QR 試打 ＋ 週追蹤</span></div>
+    <ul><li>① 大 QR（→ demo_single）② ▶API 台上實打 ③ 16週追蹤鈕</li></ul>
+  </div>
+  <div class="card">
+    <span class="num">16</span><span class="tag">DYNAMIC</span>
+    <div class="ttl">動態追蹤：<span class="k">6 場景 × 16 週模擬</span></div>
+    <ul><li>SVG 曲線：改善/惡化/穩定 5 條</li></ul>
+  </div>
+</div>
+
+<!-- ===== 收尾 ===== -->
+<div class="sec">⑥ 討論 / 未來 / 結尾 / 來源</div>
+<div class="grid">
+  <div class="card ok">
+    <span class="num">17</span><span class="tag">DISCUSSION ＋ 結論</span>
+    <div class="ttl">Discussion ＋ 結論<span class="k"> · 截面限制與總結</span></div>
+    <ul>
+      <li>異常：男性全改善時 Behav_15 反升 50%→72%；原因=人口錨點</li>
+      <li>底部新增 3 點結論：資料為王 / 行為足以預測 / 截面限制</li>
+    </ul>
+    <div class="note"><span class="chg">調整</span> 原第20頁的 3 點結論<b>整併進這頁底部</b>。</div>
+  </div>
+  <div class="card ok">
+    <span class="num">18</span><span class="tag">FUTURE WORK</span>
+    <div class="ttl">Future Work：<span class="k">從預測到介入</span></div>
+    <ul><li>⌚ 穿戴裝置 / 💊 藥物效果模擬 / 🧪 A/B 介入</li></ul>
+    <div class="note"><span class="chg">調整</span> 原第10頁「貢獻與展望」已<b>移除</b>，其未來方向併入這頁。</div>
+  </div>
+  <div class="card ok">
+    <span class="num">19</span><span class="tag">END</span>
+    <div class="ttl">Thank You · 致謝</div>
+    <ul><li>Thank You 大字 + Q&amp;A + 致謝（教師/助教/組員）</li></ul>
+    <div class="note"><span class="chg">調整</span> 原結論頁<b>簡化成純結尾</b>，資源/文獻移到最後一頁。</div>
+  </div>
+  <div class="card">
+    <span class="num">20</span><span class="tag">REFERENCES</span>
+    <div class="ttl">資料與資源來源 · <span class="k">References</span></div>
+    <ul>
+      <li>📂 資料集演進：Kaggle v1 / v2 → CDC BRFSS 2022</li>
+      <li>📚 文獻：Tirzepatide NEJM 2022 · Semaglutide NEJM 2021</li>
+      <li>🔗 資源：Demo 網站 / API /docs / GitHub</li>
+    </ul>
+    <div class="note"><span class="newp">新增</span> 全新「來源頁」放在最後一頁（三欄式）。</div>
+  </div>
+</div>
+
+<!-- ===== 本輪變更 ===== -->
+<div class="panel">
+  <h2>✅ 本輪調整紀錄</h2>
+  <ul>
+    <li><b>移除原第10頁</b>「研究貢獻與展望」，未來方向併入 Future Work（現第18頁）。</li>
+    <li><b>結論整併進 Discussion</b>（現第17頁），底部加 3 點總結 mini 卡。</li>
+    <li><b>原結論頁簡化</b>成純「Thank You ＋ 致謝」（現第19頁）。</li>
+    <li><b>新增 References 來源頁</b>（現第20頁，最後一頁）：資料集演進 + 學術文獻 + 專案資源，三欄式。</li>
+    <li><b>第14、15頁 Demo 保留</b>（15 有雙功能，不合併）。</li>
+    <li><b>Cover 加 ⊞ outline 鈕</b>連到本頁；Demo 鈕索引因刪頁改為跳第15頁；tracker/demo_single 返回鍵改 #15。</li>
+    <li>頁數：原 20 → 仍 20（刪 1 頁、加 1 頁）。</li>
+  </ul>
+  <p style="font-size:12.5px; color:var(--muted); margin-top:12px;">字眼/標題風格（中英混用、是否加分章頁）尚未動，待你下一輪指示。</p>
+</div>
+
+</body>
+</html>
