@@ -177,6 +177,12 @@
   .lc-legend{display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:12px; font-size:13px;}
   .lc-legend span{display:flex; align-items:center; gap:6px; color:var(--muted);}
   .lc-legend i{width:18px; height:4px; border-radius:2px; display:inline-block;}
+  .lc-data{margin:14px auto 0; border-collapse:collapse; font-size:clamp(11px,1.25vw,14px); width:min(840px,92vw);}
+  .lc-data th,.lc-data td{padding:5px 12px; border-bottom:1px solid var(--line); text-align:center; font-variant-numeric:tabular-nums;}
+  .lc-data th{color:var(--muted); font-weight:600;}
+  .lc-data td:first-child,.lc-data th:first-child{text-align:left;}
+  .lc-data .up{color:#fca5a5; font-weight:700;} .lc-data .dn{color:var(--green2); font-weight:700;}
+  .lc-cap{margin:12px auto 0; color:var(--muted); font-size:clamp(11px,1.2vw,13px); max-width:880px; text-align:center; line-height:1.6;}
 
   /* clickable evidence cards + modal */
   .card-i.clk{cursor:pointer; transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease; position:relative;}
@@ -490,16 +496,26 @@
 
 <!-- 17 DYNAMIC TRACKING -->
 <section class="slide" data-slide="m17">
-  <div class="head"><h2 data-anim>動態追蹤：<span class="k">6 場景 × 16 週模擬</span></h2></div>
+  <div class="head"><h2 data-anim>動態追蹤：<span class="k">4 行為情境 × 16 週（Core_6）</span></h2>
+  <div class="lead" data-anim>實線＝趨勢方向 ｜ 圓點＝模型<b>逐週真實輸出</b></div></div>
   <div class="lc-wrap">
-    <svg id="lc" viewBox="0 0 920 360" style="width:100%; height:auto;"></svg>
+    <svg id="lc" viewBox="0 0 920 300" style="width:100%; max-width:900px; height:auto;"></svg>
     <div class="lc-legend" data-anim>
-      <span><i style="background:#34d399"></i>改善·男 58→32</span>
-      <span><i style="background:#10b981"></i>改善·女 55→30</span>
-      <span><i style="background:#ef4444"></i>惡化·男 32→38</span>
+      <span><i style="background:#34d399"></i>改善 58→32</span>
+      <span><i style="background:#ef4444"></i>惡化 32→38</span>
       <span><i style="background:#60a5fa"></i>穩定·健康 7</span>
       <span><i style="background:#f59e0b"></i>穩定·高風險 38</span>
     </div>
+    <table class="lc-data" data-anim>
+      <thead><tr><th>行為情境</th><th>起 W1</th><th>末 W16</th><th>淨變化</th><th>逐週區間 (min–max)</th></tr></thead>
+      <tbody>
+        <tr><td><i style="color:#34d399">●</i> 改善</td><td>58.0%</td><td>32.0%</td><td class="dn">−26.0</td><td>4.7% – 67.6%</td></tr>
+        <tr><td><i style="color:#ef4444">●</i> 惡化</td><td>32.0%</td><td>38.4%</td><td class="up">+6.4</td><td>4.7% – 67.6%</td></tr>
+        <tr><td><i style="color:#60a5fa">●</i> 穩定·健康</td><td>7.2%</td><td>7.2%</td><td>0</td><td>7.2%（持平）</td></tr>
+        <tr><td><i style="color:#f59e0b">●</i> 穩定·高風險</td><td>37.7%</td><td>37.7%</td><td>0</td><td>37.7%（持平）</td></tr>
+      </tbody>
+    </table>
+    <div class="lc-cap" data-anim>逐週在 <b>4.7%–67.6%</b> 劇烈震盪，淨變化卻僅 −26 / +6 → 截面模型<b>無時間概念</b>，逐週為雜訊、只有起訖趨勢可信（呼應下頁 Discussion）。<span style="opacity:.7">註：Core_6 僅看行為，故改善男=改善女、惡化男=惡化女。</span></div>
   </div>
 </section>
 
@@ -643,11 +659,15 @@ const builders={
 
 function drawLineChart(){
   const svg=document.getElementById('lc');
-  const W=920,H=360,padL=58,padR=20,padT=20,padB=40;
+  const W=920,H=300,padL=58,padR=20,padT=18,padB=34;
   const x0=padL,x1=W-padR,y0=H-padB,y1=padT,weeks=16,ymax=70;
   const X=w=>x0+(x1-x0)*(w/weeks),Y=p=>y0+(y1-y0)*(p/ymax);
   function series(s0,s1){const a=[];for(let w=0;w<=weeks;w++){const t=w/weeks,e=t*t*(3-2*t);a.push(s0+(s1-s0)*e);}return a;}
-  const lines=[{c:'#34d399',d:series(58,32)},{c:'#10b981',d:series(55,30)},{c:'#ef4444',d:series(32,38)},{c:'#60a5fa',d:series(7,7)},{c:'#f59e0b',d:series(38,38)}];
+  // 真實逐週 Core_6 機率（本機模型輸出，W1..W16）
+  const IMP=[58.0,37.4,39.9,62.7,67.6,63.3,5.2,5.2,60.1,50.7,5.3,4.7,40.3,27.6,32.0,32.0];
+  const WOR=[32.0,27.6,5.0,4.7,39.5,62.1,13.4,11.5,67.6,60.5,48.1,39.9,51.5,37.4,59.1,38.4];
+  const FLAT=v=>Array(16).fill(v);
+  const lines=[{c:'#34d399',d:series(58,32),real:IMP},{c:'#ef4444',d:series(32,38),real:WOR},{c:'#60a5fa',d:series(7,7),real:FLAT(7.2)},{c:'#f59e0b',d:series(37.7,37.7),real:FLAT(37.7)}];
   const NS='http://www.w3.org/2000/svg'; svg.innerHTML='';
   for(let p=0;p<=70;p+=10){
     const ln=document.createElementNS(NS,'line');
@@ -671,6 +691,17 @@ function drawLineChart(){
     const dot=document.createElementNS(NS,'circle');
     dot.setAttribute('cx',X(weeks));dot.setAttribute('cy',Y(L.d[weeks]));dot.setAttribute('r','5');dot.setAttribute('fill',L.c);
     dot.style.opacity=0;gsap.to(dot.style,{opacity:1,duration:.3,delay:1.5+li*0.12});svg.appendChild(dot);
+    // 真實逐週：虛線鋸齒 + 圓點（W1..W16 → 對應週 1..16）
+    if(L.real){
+      const rpts=L.real.map((p,i)=>X(i+1)+','+Y(p)).join(' ');
+      const rpl=document.createElementNS(NS,'polyline');
+      rpl.setAttribute('points',rpts);rpl.setAttribute('fill','none');rpl.setAttribute('stroke',L.c);
+      rpl.setAttribute('stroke-width','1.2');rpl.setAttribute('stroke-dasharray','2 3');rpl.setAttribute('opacity','0');
+      svg.appendChild(rpl); gsap.to(rpl,{attr:{opacity:0.4},duration:.5,delay:1.7+li*0.1});
+      L.real.forEach((p,i)=>{const d=document.createElementNS(NS,'circle');
+        d.setAttribute('cx',X(i+1));d.setAttribute('cy',Y(p));d.setAttribute('r','2.6');d.setAttribute('fill',L.c);
+        d.style.opacity=0;gsap.to(d.style,{opacity:.9,duration:.25,delay:1.7+li*0.1+i*0.02});svg.appendChild(d);});
+    }
   });
 }
 
