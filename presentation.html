@@ -92,12 +92,16 @@
   .nest .n{font-size:clamp(24px,3vw,38px); font-weight:800; line-height:1;}
 
   .mtx{display:flex; gap:34px; align-items:center;}
-  .mtx-grid{display:grid; grid-template-columns:72px repeat(3,96px); grid-auto-rows:62px; gap:9px;}
+  .mtx-grid{display:grid; grid-template-columns:84px repeat(3,124px); grid-auto-rows:62px; gap:9px;}
   .mcell{border:1px solid var(--line); border-radius:10px; background:var(--card); display:flex;
     align-items:center; justify-content:center; font-size:13px; color:var(--muted); text-align:center; padding:4px;}
-  .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:14px;}
+  .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:14px;
+    flex-direction:column; gap:1px;}
+  .mcell.lbl small{font-size:10px; font-weight:500; color:var(--muted);}
   .mcell.algo{cursor:pointer; color:var(--blue2); font-weight:800; background:rgba(96,165,250,.08); border-color:#34507f;
-    transition:transform .15s, box-shadow .15s;}
+    transition:transform .15s, box-shadow .15s; flex-direction:column; gap:2px; line-height:1.1;}
+  .mcell.algo b{font-size:14px;}
+  .mcell.algo i{font-style:normal; font-size:9px; font-weight:600; color:#8fb4e6; opacity:.9;}
   .mcell.algo:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); border-color:var(--blue2);}
   .mcell.win{background:linear-gradient(180deg,var(--green),#0e9f74); color:#04231a; font-weight:800; border-color:var(--green2);}
   .mtx-hint{color:#33436e; font-size:12px; margin-top:14px; text-align:center;}
@@ -202,6 +206,12 @@
   .ev-imgs img{width:100%; display:block; border-radius:6px;}
   .ev-imgs figcaption{text-align:center; font-size:12px; color:#334155; margin-top:4px; font-weight:600;}
   .modal-card.wide{max-width:920px;}
+  .ev-imgs img{cursor:zoom-in;}
+  .imgzoom-layer{position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center; pointer-events:none;}
+  .imgzoom-layer.show{display:flex;}
+  .imgzoom-layer::before{content:''; position:absolute; inset:0; background:rgba(4,8,18,.66);}
+  .imgzoom-layer img{position:relative; max-width:88vw; max-height:88vh; background:#fff; padding:10px; border-radius:12px;
+    border:1px solid var(--blue2); box-shadow:0 30px 90px rgba(0,0,0,.7);}
   .kstat-cap{font-size:12px; color:var(--muted); margin:16px 0 6px; display:flex; align-items:center; gap:6px; font-weight:700;}
   .kstat{display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:0 0 6px;}
   .kstat .ks{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:10px; padding:9px 8px; text-align:center;}
@@ -351,14 +361,14 @@
     <div>
       <div class="mtx-grid" id="mtx27">
         <div class="mcell lbl"></div>
-        <div class="mcell algo clk" data-modal="algo_lr">LR</div>
-        <div class="mcell algo clk" data-modal="algo_rf">RF</div>
-        <div class="mcell algo clk" data-modal="algo_xgb">XGBoost</div>
-        <div class="mcell lbl">Raw</div>
+        <div class="mcell algo clk" data-modal="algo_lr"><b>LR</b><i>Logistic Regression</i></div>
+        <div class="mcell algo clk" data-modal="algo_rf"><b>RF</b><i>Random Forest</i></div>
+        <div class="mcell algo clk" data-modal="algo_xgb"><b>XGBoost</b><i>Gradient Boosting</i></div>
+        <div class="mcell lbl">Raw<small>原始</small></div>
         <div class="mcell">基準線</div><div class="mcell">抗噪較強</div><div class="mcell">對照組</div>
-        <div class="mcell lbl">SMOTE</div>
+        <div class="mcell lbl">SMOTE<small>過採樣</small></div>
         <div class="mcell">補少數類</div><div class="mcell">抗過擬合</div><div class="mcell win">🏆 最佳</div>
-        <div class="mcell lbl">Under</div>
+        <div class="mcell lbl">Under<small>降採樣</small></div>
         <div class="mcell">降採樣</div><div class="mcell">—</div><div class="mcell">—</div>
       </div>
       <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣</div>
@@ -564,6 +574,7 @@
 
 <!-- evidence modal -->
 <div class="modal-overlay" id="modal"><div class="modal-card" id="modalCard"></div></div>
+<div class="imgzoom-layer" id="imgZoom"><img alt=""></div>
 
 <script src="assets/js/gsap.min.js"></script>
 <script src="assets/js/qrcode.min.js"></script>
@@ -771,6 +782,15 @@ const MODALS={
 };
 let modalOpen=false, currentKey=null, lastOrigin=null;
 const modalEl=document.getElementById('modal'), modalCard=document.getElementById('modalCard');
+const zoomLayer=document.getElementById('imgZoom'), zoomImg=zoomLayer.querySelector('img');
+function hideZoom(){ zoomLayer.classList.remove('show'); }
+function bindModalImgZoom(){
+  modalCard.querySelectorAll('.ev-imgs img').forEach(img=>{
+    img.addEventListener('mouseenter',()=>{ if(img._sup) return; zoomImg.src=img.src; zoomLayer.classList.add('show'); });
+    img.addEventListener('mouseleave',()=>{ hideZoom(); img._sup=false; });
+    img.addEventListener('click',(e)=>{ e.stopPropagation(); hideZoom(); img._sup=true; });  // 點一下縮回
+  });
+}
 
 function openModalFromEl(key, el){
   const m=MODALS[key]; if(!m) return;
@@ -779,6 +799,7 @@ function openModalFromEl(key, el){
   modalCard.innerHTML=`<span class="mclose">×</span><h3>${m.title}</h3><div class="msub">${m.sub}</div>${m.html}`;
   modalEl.classList.add('open'); modalOpen=true;
   modalCard.querySelector('.mclose').addEventListener('click',(e)=>{e.stopPropagation();closeModal();});
+  bindModalImgZoom();
   // zoom out from the clicked element's position
   gsap.set(modalCard,{clearProps:'transform,opacity'});
   const cr=el.getBoundingClientRect(), fr=modalCard.getBoundingClientRect();
@@ -790,6 +811,7 @@ function openModalFromEl(key, el){
 }
 function closeModal(){
   if(!modalOpen) return;
+  hideZoom();
   const o=lastOrigin||{dx:0,dy:0,sc:.2};
   gsap.to(modalCard,{x:o.dx,y:o.dy,scale:o.sc,opacity:0,duration:.3,ease:'power3.in',
     onComplete:()=>{ modalEl.classList.remove('open'); modalOpen=false; currentKey=null; gsap.set(modalCard,{clearProps:'all'}); }});
