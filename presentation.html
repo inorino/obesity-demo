@@ -371,18 +371,21 @@
 <section class="slide" data-slide="m12">
   <div class="head"><h2 data-anim>兩種分類框架：<span class="k">Binary 二元 vs 3-Class 三類別</span></h2>
   <div class="lead" data-anim>同一批模型、兩種分法評估。<b>二元</b>＝Normal vs 過重+肥胖；<b>三類別</b>＝Normal / Overweight / Obese。</div></div>
-  <div class="ghc" id="ghc12">
-    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
-      <div class="ghbar bin" data-w="98"><span class="t">二元 Binary F1</span><span class="v">0.6867</span></div>
-      <div class="ghbar tri" data-w="71"><span class="t">三類別 3-Class F1</span><span class="v">0.4955</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
-      <div class="ghbar bin" data-w="97"><span class="t">二元 Binary F1</span><span class="v">0.6800</span></div>
-      <div class="ghbar tri" data-w="69"><span class="t">三類別 3-Class F1</span><span class="v">0.4831</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
-      <div class="ghbar bin" data-w="87"><span class="t">二元 Binary F1</span><span class="v">0.6082</span></div>
-      <div class="ghbar tri" data-w="60"><span class="t">三類別 3-Class F1</span><span class="v">0.4187</span></div></div>
+  <div class="row2" style="align-items:center; margin-top:1vh;">
+    <div class="half"><div class="ghc" id="ghc12" style="width:100%;">
+      <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
+        <div class="ghbar bin" data-w="98"><span class="t">二元 Binary F1</span><span class="v">0.6867</span></div>
+        <div class="ghbar tri" data-w="71"><span class="t">三類別 3-Class F1</span><span class="v">0.4955</span></div></div>
+      <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
+        <div class="ghbar bin" data-w="97"><span class="t">二元 Binary F1</span><span class="v">0.6800</span></div>
+        <div class="ghbar tri" data-w="69"><span class="t">三類別 3-Class F1</span><span class="v">0.4831</span></div></div>
+      <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
+        <div class="ghbar bin" data-w="87"><span class="t">二元 Binary F1</span><span class="v">0.6082</span></div>
+        <div class="ghbar tri" data-w="60"><span class="t">三類別 3-Class F1</span><span class="v">0.4187</span></div></div>
+    </div></div>
+    <div class="half" data-anim><div class="imgcard" style="max-width:380px;"><img src="assets/img/binary_vs_3class.png" alt="二元 vs 三類別 分類示意"></div></div>
   </div>
-  <div class="lead" data-anim style="margin-top:2vh;">二元普遍比三類別高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。<b class="em-green">故後續實驗與成績皆以二元為準。</b></div>
+  <div class="lead" data-anim style="margin-top:1.6vh;">二元普遍比三類別高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。<b class="em-green">故後續實驗與成績皆以二元為準。</b></div>
 </section>
 
 <!-- 9 EVALUATION -->
