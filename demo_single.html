@@ -156,7 +156,7 @@ const INC={1:'<$15k',2:'$15–25k',3:'$25–35k',4:'$35–50k',5:'$50–100k',6:
 const AGE={1:'18–24',2:'25–29',3:'30–34',4:'35–39',5:'40–44',6:'45–49',7:'50–54',8:'55–59',9:'60–64',10:'65–69',11:'70–74',12:'75–79',13:'80+'};
 const EMP={1:'全職',2:'兼職',3:'自雇',4:'待業(>1年)',5:'待業(<1年)',6:'家管',7:'學生',8:'退休/無法工作'};
 const opt=(m,sel)=>Object.entries(m).map(([v,t])=>`<option value="${v}" ${v==sel?'selected':''}>${v} · ${t}</option>`).join('');
-const ghOpt=()=>[1,2,3,4,5].map(v=>`<option value="${v}" ${v==4?'selected':''}>${v} ${GH[v]}</option>`).join('');
+const ghOpt=()=>[1,2,3,4,5].map(v=>`<option value="${v}" ${v==3?'selected':''}>${v} ${GH[v]}</option>`).join('');
 
 document.getElementById('general_health').innerHTML=ghOpt();
 document.getElementById('age_group').innerHTML=opt(AGE,6);
