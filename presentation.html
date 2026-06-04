@@ -200,6 +200,12 @@
   .ev-imgs img{width:100%; display:block; border-radius:6px;}
   .ev-imgs figcaption{text-align:center; font-size:12px; color:#334155; margin-top:4px; font-weight:600;}
   .modal-card.wide{max-width:920px;}
+  .kstat-cap{font-size:12px; color:var(--muted); margin:16px 0 6px; display:flex; align-items:center; gap:6px; font-weight:700;}
+  .kstat{display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:0 0 6px;}
+  .kstat .ks{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:10px; padding:9px 8px; text-align:center;}
+  .kstat .ks .ki{font-size:11px; color:var(--muted); letter-spacing:.5px; margin-bottom:3px;}
+  .kstat .ks .kv{font-size:clamp(16px,2vw,22px); font-weight:800; color:#cfe0ff; font-variant-numeric:tabular-nums;}
+  .kstat .ks .kd{font-size:10.5px; color:var(--green2); margin-top:2px;}
   /* clickable table rows */
   table.tbl tr.clk{cursor:pointer; transition:background .15s;}
   table.tbl tr.clk:hover td{background:rgba(96,165,250,.10);}
@@ -266,14 +272,15 @@
 
 <!-- 3 ITERATION -->
 <section class="slide" data-slide="m03">
-  <div class="head"><h2 data-anim>三版本迭代：<span class="k">從失敗中換來的判斷力</span></h2>
-  <div class="lead" data-anim>每一次踩坑，都讓我們更清楚「什麼才是真正可用的資料」。<span style="color:#33436e;">（點任一版本看詳情）</span></div></div>
+  <div class="head"><h2 data-anim>四版本迭代：<span class="k">從失敗中換來的判斷力</span></h2>
+  <div class="lead" data-anim>每一次踩坑，都讓我們更清楚「什麼才是真正可用的資料」。<span style="color:#33436e;">（點任一版本看詳情與 Kaggle 熱度）</span></div></div>
   <table class="tbl">
     <thead><tr><th>版本</th><th>資料集</th><th>規模</th><th>為何放棄 / 採用</th></tr></thead>
     <tbody>
-      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Kaggle obesity_level</td><td>2,111 筆</td><td>❌ 合成資料，BMI 邊界不符 WHO 標準</td></tr>
-      <tr class="clk" data-anim data-modal="v2"><td>v2</td><td>Kaggle heart_2020</td><td>320k 筆</td><td>❌ 僅 18 欄、COVID 首年、無睡眠變數</td></tr>
-      <tr class="win clk" data-anim data-modal="v3"><td>v3 ✅</td><td>CDC BRFSS 2022 原始 XPT</td><td>445k → 329k</td><td>✅ 官方原始、328 變數可選、含睡眠</td></tr>
+      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Lifestyle and Wellbeing Data</td><td>15,972 × 24</td><td>❌ 生活滿意度問卷、BMI 僅粗略二分、代表性不足</td></tr>
+      <tr class="clk" data-anim data-modal="v2"><td>v2</td><td>Obesity Risk Dataset（Playground S4E2）</td><td>20,800 × 17</td><td>❌ 合成放大資料、BMI 邊界不符 WHO 標準</td></tr>
+      <tr class="clk" data-anim data-modal="v3"><td>v3</td><td>Heart Disease（heart_2020_cleaned）</td><td>319,795 × 18</td><td>❌ 第三方清洗僅 18 欄、2020 疫情年、無睡眠</td></tr>
+      <tr class="win clk" data-anim data-modal="v4"><td>v4 ✅</td><td>CDC BRFSS 2022 原始 XPT</td><td>445k → 329k</td><td>✅ 官方原始、328 變數可選、含睡眠</td></tr>
     </tbody>
   </table>
 </section>
@@ -300,7 +307,7 @@
     <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:89%">396,326</div></div><div class="fn-meta">刪 BMI 缺值 <span class="fn-drop">−48,806</span></div></div>
     <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:88%">392,216</div></div><div class="fn-meta">移除 SLEPTIM1 無效（77/99）<span class="fn-drop">−4,110</span></div></div>
     <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:76%">338,666</div></div><div class="fn-meta">刪核心欄位無效值 <span class="fn-drop">−53,550</span></div></div>
-    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:74%; background:linear-gradient(90deg,var(--green),var(--green2)); color:#04231a;">329,126</div></div><div class="fn-meta em-green">✅ 清理 4 個 v3 變數 + 修正 99900 異常碼 → 最終 26 欄</div></div>
+    <div class="fn-row" data-fn><div class="fn-track"><div class="fn-bar" style="width:74%; background:linear-gradient(90deg,var(--green),var(--green2)); color:#04231a;">329,126</div></div><div class="fn-meta em-green">✅ 清理新增 4 個變數 + 修正 99900 異常碼 → 最終 26 欄</div></div>
   </div>
   <div class="lead" data-anim style="margin-top:3vh;">體重過輕重編為正常（n=6,778，改標籤不刪行）；每一步都基於資料字典逐欄判斷。</div>
 </section>
@@ -311,7 +318,7 @@
     <div class="head"><h2 data-anim>ETL 關鍵編碼決策</h2><div class="lead" data-anim>魔鬼藏在編碼細節裡</div></div>
     <div class="grid g1">
       <div class="card-i lft clk" data-anim data-modal="menthlth"><div class="t">MENTHLTH / PHYSHLTH = 88</div><div class="d">→ <b>0 天</b>。BRFSS 用 88 代表「沒有任何一天不適」，不可當缺值刪。</div></div>
-      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。v3 新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。v4 新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
       <div class="card-i lft clk" data-anim data-modal="genhlth"><div class="t">GENHLTH 反向處理</div><div class="d">原始 1=最好、5=最差，反向後讓<b>數值方向與風險一致</b>。</div></div>
       <div class="card-i lft clk" data-anim data-modal="conttype"><div class="t">連續 vs 類別</div><div class="d">連續特徵保留原值；類別特徵 <b>Label Encoding</b>。</div></div>
     </div>
@@ -493,7 +500,7 @@
     <div class="half" data-anim><div class="imgcard" style="max-width:360px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
   </div>
   <div class="concl-strip" data-anim style="display:flex; gap:14px; margin-top:2.6vh; width:min(1080px,92vw); justify-content:center; flex-wrap:wrap;">
-    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是 v3 成功的關鍵。</div></div></div>
+    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是 v4 成功的關鍵。</div></div></div>
     <div class="cc-mini"><span class="ccn em-green">2</span><div><b>行為足以預測肥胖</b><div class="ccd">6 問達 F1=0.608；15 變數 0.680，僅低全特徵 1%。</div></div></div>
     <div class="cc-mini"><span class="ccn em-amber">3</span><div><b>截面模型有其限制</b><div class="ccd">跨個人預測穩定，縱向敏感度受限，留待未來。</div></div></div>
   </div>
@@ -529,9 +536,10 @@
     <div class="card-i acc-b" data-anim>
       <div class="t">📂 資料集演進</div>
       <div class="src">
-        <div class="src-i"><b>v1 · Kaggle — Obesity Levels</b><span>2,111 筆（合成資料）· 已棄用</span></div>
-        <div class="src-i"><b>v2 · Kaggle — heart_2020_cleaned</b><span>BRFSS 2020 第三方清洗版 · 320k · 已棄用</span></div>
-        <div class="src-i win"><b>v3 ✅ · CDC BRFSS 2022 原始 XPT</b><span>445k → 329k 筆 · cdc.gov/brfss</span></div>
+        <div class="src-i"><b>v1 · Lifestyle and Wellbeing Data</b><span>15,972×24 · kaggle.com/datasets/ydalat/lifestyle-and-wellbeing-data · 已棄用</span></div>
+        <div class="src-i"><b>v2 · Obesity Risk Dataset（S4E2）</b><span>20,800×17 · kaggle.com/datasets/jpkochar/obesity-risk-dataset · Palechor 2019 · 已棄用</span></div>
+        <div class="src-i"><b>v3 · Heart Disease（heart_2020_cleaned）</b><span>319,795×18 · kaggle.com/datasets/kamilpytlak/personal-key-indicators-of-heart-disease · 已棄用</span></div>
+        <div class="src-i win"><b>v4 ✅ · CDC BRFSS 2022 原始 XPT</b><span>445k → 329k · cdc.gov/brfss/annual_data/annual_2022.html</span></div>
       </div>
     </div>
     <div class="card-i acc-v" data-anim>
@@ -667,7 +675,7 @@ const MODALS={
       <div class="ev-bar-row"><span>修正前</span><div class="ev-bar-track"><div class="ev-bar-fill amb" style="width:100%"></div></div><span>max = 999</span></div>
       <div class="ev-bar-row"><span>修正後</span><div class="ev-bar-track"><div class="ev-bar-fill" style="width:53%"></div></div><span>max = 532</span></div>
     </div>
-    <div class="ev-good">✅ 移除 <b>2,114 筆</b> 99900 異常碼後，drinks_per_week 上限從 999 → <b>532</b>（回到合理範圍）。這是 v3 才抓到的 bug。</div>`},
+    <div class="ev-good">✅ 移除 <b>2,114 筆</b> 99900 異常碼後，drinks_per_week 上限從 999 → <b>532</b>（回到合理範圍）。這是 v4 才抓到的 bug。</div>`},
   genhlth:{title:'GENHLTH 為什麼要反向？',sub:'自評整體健康',html:`
     <p>原始編碼：<b>1=非常好 … 5=很差</b>，<b>7/9</b> = 不知道 / 拒答（已移除）。原始方向是「數值越大越健康」的相反，容易誤讀。</p>
     <p>反向後讓<b>數值越大 = 風險越高</b>，與其他特徵方向一致，模型與圖表更好解讀。</p>
@@ -707,22 +715,56 @@ const MODALS={
       <figure><img src="assets/plots/Behav_15feat_confusion.png"><figcaption>混淆矩陣 · Behav_15</figcaption></figure>
       <figure><img src="assets/plots/Core_6feat_confusion.png"><figcaption>混淆矩陣 · Core_6</figcaption></figure>
     </div>`},
-  v1:{title:'v1 — Kaggle obesity_level',sub:'2,111 筆 · 合成資料',html:`
-    <p>來源：Kaggle「Obesity Levels」資料集，以 SMOTE 從少量真實樣本<b>合成</b>放大到 2,111 筆。</p>
+  v1:{title:'v1 — Lifestyle and Wellbeing Data',sub:'15,972 筆 × 24 指標 · Kaggle (ydalat)',html:`
+    <p>最初為避開醫療個資，採用 Kaggle「工作-生活平衡」問卷，含每日步數、睡眠、壓力等 24 項生活型態指標。</p>
     <table class="ev-table"><tbody>
-      <tr><th>筆數</th><td>2,111（合成）</td></tr><tr><th>特徵</th><td>約 17 欄</td></tr><tr><th>目標</th><td>7 級 BMI 分類</td></tr></tbody></table>
-    <div class="ev-note">❌ 放棄主因：合成資料的 BMI 邊界<b>不符 WHO 標準</b>，且小資料 + 深度學習嚴重過擬合，無法外推真實族群。</div>
+      <tr><th>筆數</th><td>15,972</td></tr><tr><th>特徵</th><td>24 項生活指標（步數 / 睡眠 / 壓力…）</td></tr><tr><th>目標</th><td>BMI 區間（僅粗略二分）</td></tr></tbody></table>
+    <div class="kstat-cap">📊 Kaggle Activity Overview</div>
+    <div class="kstat">
+      <div class="ks"><div class="ki">Views</div><div class="kv">93.2K</div><div class="kd">+1,232 / 30d</div></div>
+      <div class="ks"><div class="ki">Downloads</div><div class="kv">12.3K</div><div class="kd">+85 / 30d</div></div>
+      <div class="ks"><div class="ki">Engagement</div><div class="kv">0.132</div><div class="kd">dl / view</div></div>
+      <div class="ks"><div class="ki">Comments</div><div class="kv">25</div><div class="kd">posted</div></div>
+    </div>
+    <div class="ev-note">❌ 放棄主因：本質是<b>生活滿意度問卷</b>、BMI 僅粗略二分（&lt;/≥25）、樣本偏小且<b>代表性不足</b>。</div>
     <div class="ev-good">✅ 收穫：建立第一版 FastAPI 部署流程與 EDA 範本。</div>`},
-  v2:{title:'v2 — Kaggle heart_2020_cleaned',sub:'320k 筆 · BRFSS 2020 第三方清洗版',html:`
+  v2:{title:'v2 — Kaggle Obesity Risk Dataset',sub:'20,800+ 筆 × 17 特徵 · Playground Series S4E2',html:`
+    <p>來源：Kaggle Playground S4E2，以深度學習從 Palechor &amp; de la Hoz Manotas (2019) 原始肥胖資料<b>合成放大</b>。</p>
+    <table class="ev-table"><tbody>
+      <tr><th>筆數</th><td>20,800+（合成放大）</td></tr><tr><th>特徵</th><td>17 項（飲食習慣 + 身體狀況）</td></tr><tr><th>目標</th><td>7 級 BMI 分類</td></tr></tbody></table>
+    <div class="kstat-cap">📊 Kaggle Activity Overview</div>
+    <div class="kstat">
+      <div class="ks"><div class="ki">Views</div><div class="kv">30.3K</div><div class="kd">+564 / 30d</div></div>
+      <div class="ks"><div class="ki">Downloads</div><div class="kv">4,405</div><div class="kd">+69 / 30d</div></div>
+      <div class="ks"><div class="ki">Engagement</div><div class="kv">0.145</div><div class="kd">dl / view</div></div>
+      <div class="ks"><div class="ki">Comments</div><div class="kv">3</div><div class="kd">posted</div></div>
+    </div>
+    <div class="ev-note">❌ 放棄主因：仍是<b>合成放大資料</b>，BMI 邊界<b>不符 WHO 標準</b>，無法外推真實族群。</div>
+    <div class="ev-good">✅ 收穫：確立以 BMI 分類為建模目標的方向。</div>`},
+  v3:{title:'v3 — Personal Key Indicators of Heart Disease',sub:'heart_2020_cleaned.csv · 319,795 × 18 · BRFSS 2020',html:`
     <p>來源：Kaggle 釋出的 <b>BRFSS 2020 第三方清洗版</b>（原為心臟病導向）。資料量夠大，但被別人預處理過。</p>
     <table class="ev-table"><tbody>
-      <tr><th>筆數</th><td>約 320,000</td></tr><tr><th>特徵</th><td>僅 18 欄</td></tr><tr><th>年份</th><td>2020（COVID 首年）</td></tr></tbody></table>
+      <tr><th>筆數</th><td>319,795</td></tr><tr><th>特徵</th><td>僅 18 欄</td></tr><tr><th>年份</th><td>2020（COVID 首年）</td></tr></tbody></table>
+    <div class="kstat-cap">📊 Kaggle Activity Overview</div>
+    <div class="kstat">
+      <div class="ks"><div class="ki">Views</div><div class="kv">542K</div><div class="kd">+3,038 / 30d</div></div>
+      <div class="ks"><div class="ki">Downloads</div><div class="kv">103K</div><div class="kd">+920 / 30d</div></div>
+      <div class="ks"><div class="ki">Engagement</div><div class="kv">0.191</div><div class="kd">dl / view</div></div>
+      <div class="ks"><div class="ki">Comments</div><div class="kv">55</div><div class="kd">posted</div></div>
+    </div>
     <div class="ev-note">❌ 放棄主因：① 第三方預處理只剩 <b>18 欄</b>，丟失原始變數 ② 2020 行為受疫情扭曲 ③ <b>無 SLEPTIM1 睡眠</b>變數。</div>
     <div class="ev-good">✅ 收穫：確立 3 特徵集 × 3 演算法 × 3 抽樣 = 27 模型 的實驗框架。</div>`},
-  v3:{title:'v3 — CDC BRFSS 2022 原始 XPT ✅',sub:'445,132 → 329,126 筆 · 官方原始',html:`
-    <p>回歸 <b>CDC 官方原始 SAS Transport（.XPT）</b>，自己做 ETL，掌握每一個編碼決策。</p>
+  v4:{title:'v4 — CDC BRFSS 2022 原始 XPT ✅',sub:'445,132 → 329,126 筆 · 我們自己 ETL 的官方原始版',html:`
+    <p>回歸 <b>CDC 官方原始 SAS Transport（.XPT）</b>，自己做 ETL，掌握每一個編碼決策——不再依賴任何第三方清洗。</p>
     <table class="ev-table"><tbody>
       <tr><th>原始</th><td class="hl">445,132 筆 × 328 變數</td></tr><tr><th>清理後</th><td class="hl">329,126 筆 × 26 欄</td></tr><tr><th>特徵集</th><td>Full_25 / Behav_15 / Core_6</td></tr></tbody></table>
+    <div class="kstat-cap">🏛️ 非 Kaggle 二手 · 直接 CDC 官方下載</div>
+    <div class="kstat">
+      <div class="ks"><div class="ki">原始筆數</div><div class="kv">445K</div><div class="kd">× 328 變數</div></div>
+      <div class="ks"><div class="ki">清理後</div><div class="kv">329K</div><div class="kd">× 26 欄</div></div>
+      <div class="ks"><div class="ki">特徵集</div><div class="kv">3</div><div class="kd">階梯式</div></div>
+      <div class="ks"><div class="ki">最佳 F1</div><div class="kv">0.687</div><div class="kd">Binary XGB</div></div>
+    </div>
     <div class="ev-good">✅ 採用主因：官方原始、328 變數自由選、含睡眠、可設計三層階梯特徵集。最佳 Binary F1 = <b>0.687</b>。</div>`}
 };
 let modalOpen=false, currentKey=null, lastOrigin=null;
