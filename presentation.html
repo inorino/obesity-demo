@@ -51,7 +51,9 @@
   .grid{display:grid; gap:16px; width:min(1120px,90vw);}
   .g1{grid-template-columns:1fr;} .g2{grid-template-columns:repeat(2,1fr);} .g3{grid-template-columns:repeat(3,1fr);} .g4{grid-template-columns:repeat(4,1fr);}
   .card-i{background:var(--card); border:1px solid var(--line); border-radius:15px; padding:16px 20px;}
-  .card-i .t{font-size:clamp(14px,1.6vw,20px); font-weight:700; margin-bottom:.4em; display:flex; gap:.4em; align-items:baseline;}
+  .card-i .t{font-size:clamp(14px,1.6vw,20px); font-weight:700; margin-bottom:.4em; display:flex; gap:.5em; align-items:baseline; flex-wrap:wrap;}
+  .card-i .t .zh{font-size:.66em; font-weight:500; color:var(--blue2); background:rgba(96,165,250,.1);
+    border:1px solid rgba(96,165,250,.25); border-radius:6px; padding:1px 8px;}
   .card-i .d{color:var(--muted); font-size:clamp(12px,1.3vw,15px); line-height:1.5;}
   .card-i.acc-b{border-top:3px solid var(--blue2);} .card-i.acc-g{border-top:3px solid var(--green2);}
   .card-i.acc-a{border-top:3px solid var(--amber2);} .card-i.acc-v{border-top:3px solid var(--violet);}
@@ -317,10 +319,10 @@
   <div class="col-main">
     <div class="head"><h2 data-anim>ETL 關鍵編碼決策</h2><div class="lead" data-anim>魔鬼藏在編碼細節裡</div></div>
     <div class="grid g1">
-      <div class="card-i lft clk" data-anim data-modal="menthlth"><div class="t">MENTHLTH / PHYSHLTH = 88</div><div class="d">→ <b>0 天</b>。BRFSS 用 88 代表「沒有任何一天不適」，不可當缺值刪。</div></div>
-      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。最終版新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
-      <div class="card-i lft clk" data-anim data-modal="genhlth"><div class="t">GENHLTH 反向處理</div><div class="d">原始 1=最好、5=最差，反向後讓<b>數值方向與風險一致</b>。</div></div>
-      <div class="card-i lft clk" data-anim data-modal="conttype"><div class="t">連續 vs 類別</div><div class="d">連續特徵保留原值；類別特徵 <b>Label Encoding</b>。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="menthlth"><div class="t">MENTHLTH / PHYSHLTH = 88<span class="zh">心理／身體不適天數</span></div><div class="d">→ <b>0 天</b>。BRFSS 用 88 代表「沒有任何一天不適」，不可當缺值刪。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900<span class="zh">每週估計飲酒量</span></div><div class="d">→ <b>NaN</b>。最終版新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="genhlth"><div class="t">GENHLTH 反向處理<span class="zh">自評整體健康</span></div><div class="d">原始 1=最好、5=最差，反向後讓<b>數值方向與風險一致</b>。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="conttype"><div class="t">連續 vs 類別<span class="zh">特徵型別編碼策略</span></div><div class="d">連續特徵保留原值；類別特徵 <b>Label Encoding</b>。</div></div>
     </div>
   </div>
   <div class="col-photo" data-anim><img src="assets/img/s06_hero.png" alt=""></div>
