@@ -71,6 +71,7 @@
   table.tbl th, table.tbl td{padding:13px 16px; text-align:left; border-bottom:1px solid var(--line);}
   table.tbl th{color:var(--muted); font-weight:600; font-size:.9em;}
   table.tbl td:first-child{font-weight:800;}
+  .klogo{height:16px; vertical-align:-3px; margin-right:10px;}
   table.tbl tr.win td{background:rgba(16,185,129,.10);} table.tbl tr.win td:first-child{color:var(--green2);}
 
   .funnel{display:flex; flex-direction:column; gap:11px; width:min(820px,88vw);}
@@ -92,23 +93,23 @@
   .nest .n{font-size:clamp(24px,3vw,38px); font-weight:800; line-height:1;}
 
   .mtx{display:flex; gap:30px; align-items:center; justify-content:center;}
-  .mtx-grid{display:grid; grid-template-columns:84px repeat(3,124px); grid-auto-rows:62px; gap:9px;}
-  .mcell{border:1px solid var(--line); border-radius:10px; background:var(--card); display:flex;
-    align-items:center; justify-content:center; font-size:13px; color:var(--muted); text-align:center; padding:4px;}
-  .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:14px;
+  .mtx-grid{display:grid; grid-template-columns:104px repeat(3,154px); grid-auto-rows:82px; gap:12px;}
+  .mcell{border:1px solid var(--line); border-radius:11px; background:var(--card); display:flex;
+    align-items:center; justify-content:center; font-size:16px; color:var(--muted); text-align:center; padding:4px;}
+  .mcell.lbl{background:transparent; border:none; color:var(--ink); font-weight:700; font-size:17px;
     flex-direction:column; gap:1px;}
-  .mcell.lbl small{font-size:10px; font-weight:500; color:var(--muted);}
+  .mcell.lbl small{font-size:12px; font-weight:500; color:var(--muted);}
   .mcell.algo{cursor:pointer; color:var(--blue2); font-weight:800; background:rgba(96,165,250,.08); border-color:#34507f;
-    transition:transform .15s, box-shadow .15s; flex-direction:column; gap:2px; line-height:1.1;}
-  .mcell.algo b{font-size:14px;}
-  .mcell.algo i{font-style:normal; font-size:9px; font-weight:600; color:#8fb4e6; opacity:.9;}
+    transition:transform .15s, box-shadow .15s; flex-direction:column; gap:3px; line-height:1.1;}
+  .mcell.algo b{font-size:18px;}
+  .mcell.algo i{font-style:normal; font-size:10.5px; font-weight:600; color:#8fb4e6; opacity:.9;}
   .mcell.algo:hover{transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); border-color:var(--blue2);}
   .mcell.win{background:linear-gradient(180deg,var(--green),#0e9f74); color:#04231a; font-weight:800; border-color:var(--green2);}
   .mtx-hint{color:#33436e; font-size:12px; margin-top:14px; text-align:center;}
 
-  .chart{display:flex; gap:40px; align-items:flex-end; height:34vh; padding-top:48px;}
-  .barwrap{display:flex; flex-direction:column; align-items:center; gap:12px; width:140px;}
-  .bar{width:96px; border-radius:12px 12px 0 0; background:linear-gradient(180deg,var(--blue2),var(--blue)); height:0; position:relative;}
+  .chart{display:flex; gap:64px; align-items:flex-end; justify-content:center; height:46vh; padding-top:54px;}
+  .barwrap{display:flex; flex-direction:column; align-items:center; gap:14px; width:190px;}
+  .bar{width:132px; border-radius:14px 14px 0 0; background:linear-gradient(180deg,var(--blue2),var(--blue)); height:0; position:relative;}
   .bar.b15{background:linear-gradient(180deg,var(--green2),var(--green));}
   .bar.b6{background:linear-gradient(180deg,var(--amber2),var(--amber));}
   .bar .val{position:absolute; top:-34px; left:0; right:0; text-align:center; font-size:clamp(16px,1.8vw,26px); font-weight:800;}
@@ -294,9 +295,9 @@
   <table class="tbl">
     <thead><tr><th>版本</th><th>資料集</th><th>規模</th><th>為何放棄 / 採用</th></tr></thead>
     <tbody>
-      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Lifestyle and Wellbeing Data</td><td>15,972 × 24</td><td>❌ 資料不足</td></tr>
-      <tr class="clk" data-anim data-modal="v2"><td>v2</td><td>Obesity Risk Dataset（Playground S4E2）</td><td>20,800 × 17</td><td>❌ 合成放大資料、BMI 邊界不符 WHO 標準</td></tr>
-      <tr class="clk" data-anim data-modal="v3"><td>v3</td><td>Heart Disease（heart_2020_cleaned）</td><td>319,795 × 18</td><td>❌ 第三方清洗僅 18 欄、2020 疫情年、無睡眠</td></tr>
+      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td><img class="klogo" src="assets/img/kaggle.png" alt="Kaggle">Lifestyle and Wellbeing Data</td><td>15,972 × 24</td><td>❌ 資料不足</td></tr>
+      <tr class="clk" data-anim data-modal="v2"><td>v2</td><td><img class="klogo" src="assets/img/kaggle.png" alt="Kaggle">Obesity Risk Dataset（Playground S4E2）</td><td>20,800 × 17</td><td>❌ 合成放大資料、BMI 邊界不符 WHO 標準</td></tr>
+      <tr class="clk" data-anim data-modal="v3"><td>v3</td><td><img class="klogo" src="assets/img/kaggle.png" alt="Kaggle">Heart Disease（heart_2020_cleaned）</td><td>319,795 × 18</td><td>❌ 第三方清洗僅 18 欄、2020 疫情年、無睡眠</td></tr>
       <tr class="win clk" data-anim data-modal="v4"><td>v4 ✅</td><td>CDC BRFSS 2022 原始 XPT</td><td>445k → 329k</td><td>✅ 官方原始、328 變數可選、含睡眠</td></tr>
     </tbody>
   </table>
@@ -407,23 +408,20 @@
       </div>
       <div class="mtx-hint">🔍 點演算法名稱看各特徵集的 F1 熱圖與混淆矩陣（結果皆為二元）</div>
     </div>
-    <div style="max-width:250px;">
+    <div style="max-width:300px;">
       <div class="lead" data-anim style="text-align:left;">直欄 = 演算法、橫列 = 抽樣策略。每格 × <b>3 個特徵集</b> = <b class="accent">27 組模型</b>。<br><br>XGBoost + SMOTE 在三個特徵集<b class="em-green">全數奪冠</b>。</div>
     </div>
   </div>
 </section>
 
-<!-- 11 F1 RESULTS BARS（二元）-->
-<section class="slide split" data-slide="m11">
-  <div class="col-main">
-    <div class="head"><h2 data-anim>結果：F1 成績總表<span class="k">（二元 Binary）</span></h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
-    <div class="chart" id="chart11">
-      <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>25 特徵</div></div>
-      <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>15 行為</div></div>
-      <div class="barwrap"><div class="bar b6" data-bar="0.6082"><span class="val" data-count="0.6082">0</span></div><div class="cap"><b>Core_6</b>6 核心</div></div>
-    </div>
+<!-- 11 F1 RESULTS BARS（二元，置中放大）-->
+<section class="slide" data-slide="m11">
+  <div class="head"><h2 data-anim>結果：F1 成績總表<span class="k">（二元 Binary）</span></h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
+  <div class="chart" id="chart11">
+    <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>25 特徵</div></div>
+    <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>15 行為</div></div>
+    <div class="barwrap"><div class="bar b6" data-bar="0.6082"><span class="val" data-count="0.6082">0</span></div><div class="cap"><b>Core_6</b>6 核心</div></div>
   </div>
-  <div class="col-photo" data-anim><img src="assets/img/s11_hero.png" alt=""></div>
 </section>
 
 <!-- 13 KEY FINDING -->
@@ -634,7 +632,7 @@ const builders={
   m07(s){gsap.fromTo(s.querySelectorAll('.nest'),{y:40,opacity:0,scale:.92},{y:0,opacity:1,scale:1,duration:.55,ease:'back.out(1.5)',stagger:.16});},
   m08(s){gsap.fromTo(s.querySelectorAll('.mcell'),{opacity:0,scale:.8},{opacity:1,scale:1,duration:.4,ease:'power2.out',stagger:.03});},
   m11(s){s.querySelectorAll('.bar').forEach(b=>{
-    const t=parseFloat(b.dataset.bar),maxH=24;
+    const t=parseFloat(b.dataset.bar),maxH=32;
     gsap.fromTo(b,{height:0},{height:(t*maxH/0.8)+'vh',duration:1,ease:'power2.out',delay:.2});
     const v=b.querySelector('.val'),o={v:0};
     gsap.to(o,{v:t,duration:1,ease:'power2.out',delay:.2,onUpdate:()=>v.textContent=o.v.toFixed(4)});});},
