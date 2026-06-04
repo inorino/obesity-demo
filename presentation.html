@@ -108,8 +108,8 @@
   .mcell.win.clk:hover{transform:translateY(-2px); box-shadow:0 8px 22px rgba(16,185,129,.4);}
   .mtx-hint{color:#33436e; font-size:12px; margin-top:14px; text-align:center;}
 
-  .chart{display:flex; gap:64px; align-items:flex-end; justify-content:center; height:46vh; padding-top:54px;}
-  .barwrap{display:flex; flex-direction:column; align-items:center; gap:14px; width:190px;}
+  .chart{display:flex; gap:60px; align-items:flex-end; justify-content:center; height:34vh; padding-top:48px;}
+  .barwrap{display:flex; flex-direction:column; align-items:center; gap:12px; width:180px;}
   .bar{width:132px; border-radius:14px 14px 0 0; background:linear-gradient(180deg,var(--blue2),var(--blue)); height:0; position:relative;}
   .bar.b15{background:linear-gradient(180deg,var(--green2),var(--green));}
   .bar.b6{background:linear-gradient(180deg,var(--amber2),var(--amber));}
@@ -450,9 +450,13 @@
 <section class="slide" data-slide="m11">
   <div class="head"><h2 data-anim>結果：F1 成績總表<span class="k">（二元 Binary）</span></h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
   <div class="chart" id="chart11">
-    <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>25 特徵</div></div>
-    <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>15 行為</div></div>
-    <div class="barwrap"><div class="bar b6" data-bar="0.6082"><span class="val" data-count="0.6082">0</span></div><div class="cap"><b>Core_6</b>6 核心</div></div>
+    <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>行為+健康+病史+人口</div></div>
+    <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>行為+健康+人口</div></div>
+    <div class="barwrap"><div class="bar b6" data-bar="0.6082"><span class="val" data-count="0.6082">0</span></div><div class="cap"><b>Core_6</b>純行為 6 項</div></div>
+  </div>
+  <div class="grid g2" style="width:min(940px,90vw); margin-top:2.6vh;">
+    <div class="card-i acc-b" data-anim><div class="t">📋 三特徵集組成</div><div class="d"><b>Core_6</b>：純可控行為（睡眠/吸菸/飲酒/運動/自評健康）<br><b>Behav_15</b>：＋健康狀態＋人口統計<br><b>Full_25</b>：再＋7 項慢性病史</div></div>
+    <div class="card-i acc-g" data-anim><div class="t">🏆 為何 XGBoost ＋ SMOTE 最佳</div><div class="d"><b>XGBoost</b>：梯度提升，擅長表格資料的<b>非線性與特徵交互</b><br><b>SMOTE</b>：平衡 1:2 類別、補足少數類<br>→ 27 組中三特徵集<b class="em-green">全數奪冠</b></div></div>
   </div>
 </section>
 
@@ -511,11 +515,9 @@
         <div class="node"><div class="ni">📊</div><div class="nt">儀表板</div><div class="ns">看結果</div></div>
       </div>
     </div>
-    <div class="demo-panel" data-anim>
-      <div style="text-align:center; color:var(--muted); font-size:13px;">② 開「單日試打」頁 · 跟同學掃的 QR 同一頁</div>
-      <a href="demo_single.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none; margin-top:16px;">▶ API</a>
-      <div class="demo-status" id="demoStatus" style="margin:10px 0 4px;">填一天 → 真打 API → 改善 / 惡化 雙 Y 軸曲線</div>
-      <a href="tracker.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none; margin-top:8px; background:linear-gradient(90deg,var(--violet),var(--blue2));">📈 ③ 開啟「16 週追蹤」Demo（台上版）</a>
+    <div class="demo-panel" data-anim style="display:flex; flex-direction:column; justify-content:center; gap:14px;">
+      <a href="demo_single.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none;">▶ 單日 API</a>
+      <a href="tracker.html" target="_blank" class="demo-btn" style="display:block; text-align:center; text-decoration:none; background:linear-gradient(90deg,var(--violet),var(--blue2));">📈 開啟 16 週追蹤 Demo</a>
     </div>
   </div>
 </section>
@@ -662,7 +664,7 @@ const builders={
   m07(s){gsap.fromTo(s.querySelectorAll('.nest'),{y:40,opacity:0,scale:.92},{y:0,opacity:1,scale:1,duration:.55,ease:'back.out(1.5)',stagger:.16});},
   m08(s){gsap.fromTo(s.querySelectorAll('.mcell'),{opacity:0,scale:.8},{opacity:1,scale:1,duration:.4,ease:'power2.out',stagger:.03});},
   m11(s){s.querySelectorAll('.bar').forEach(b=>{
-    const t=parseFloat(b.dataset.bar),maxH=32;
+    const t=parseFloat(b.dataset.bar),maxH=24;
     gsap.fromTo(b,{height:0},{height:(t*maxH/0.8)+'vh',duration:1,ease:'power2.out',delay:.2});
     const v=b.querySelector('.val'),o={v:0};
     gsap.to(o,{v:t,duration:1,ease:'power2.out',delay:.2,onUpdate:()=>v.textContent=o.v.toFixed(4)});});},
