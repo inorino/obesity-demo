@@ -390,10 +390,28 @@
   <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
 </section>
 
-<!-- 11 F1 RESULTS BARS -->
+<!-- 10 BINARY VS 3CLASS（先講分類框架，再看成績）-->
+<section class="slide" data-slide="m12">
+  <div class="head"><h2 data-anim>兩種分類框架：<span class="k">Binary 二元 vs 3-Class 三類別</span></h2>
+  <div class="lead" data-anim>同一批模型、兩種分法評估。<b>二元</b>＝Normal vs 過重+肥胖；<b>三類別</b>＝Normal / Overweight / Obese。</div></div>
+  <div class="ghc" id="ghc12">
+    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
+      <div class="ghbar bin" data-w="98"><span class="t">二元 Binary F1</span><span class="v">0.6867</span></div>
+      <div class="ghbar tri" data-w="71"><span class="t">三類別 3-Class F1</span><span class="v">0.4955</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
+      <div class="ghbar bin" data-w="97"><span class="t">二元 Binary F1</span><span class="v">0.6800</span></div>
+      <div class="ghbar tri" data-w="69"><span class="t">三類別 3-Class F1</span><span class="v">0.4831</span></div></div>
+    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
+      <div class="ghbar bin" data-w="87"><span class="t">二元 Binary F1</span><span class="v">0.6082</span></div>
+      <div class="ghbar tri" data-w="60"><span class="t">三類別 3-Class F1</span><span class="v">0.4187</span></div></div>
+  </div>
+  <div class="lead" data-anim style="margin-top:2vh;">二元普遍比三類別高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。<b class="em-green">故後續成績總表皆以二元為準。</b></div>
+</section>
+
+<!-- 11 F1 RESULTS BARS（二元）-->
 <section class="slide split" data-slide="m11">
   <div class="col-main">
-    <div class="head"><h2 data-anim>結果：F1 成績總表</h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
+    <div class="head"><h2 data-anim>結果：F1 成績總表<span class="k">（二元 Binary）</span></h2><div class="lead" data-anim>XGBoost + SMOTE 三個特徵集均達最佳</div></div>
     <div class="chart" id="chart11">
       <div class="barwrap"><div class="bar" data-bar="0.6867"><span class="val" data-count="0.6867">0</span></div><div class="cap"><b>Full_25</b>25 特徵</div></div>
       <div class="barwrap"><div class="bar b15" data-bar="0.6800"><span class="val" data-count="0.6800">0</span></div><div class="cap"><b>Behav_15</b>15 行為</div></div>
@@ -401,23 +419,6 @@
     </div>
   </div>
   <div class="col-photo" data-anim><img src="assets/img/s11_hero.png" alt=""></div>
-</section>
-
-<!-- 12 BINARY VS 3CLASS -->
-<section class="slide" data-slide="m12">
-  <div class="head"><h2 data-anim>Binary vs 3-Class：<span class="k">分類成績一覽</span></h2></div>
-  <div class="ghc" id="ghc12">
-    <div class="ghc-grp" data-anim><div class="gl accent">Full_25（25 特徵）</div>
-      <div class="ghbar bin" data-w="98"><span class="t">Binary F1</span><span class="v">0.6867</span></div>
-      <div class="ghbar tri" data-w="71"><span class="t">3-Class F1</span><span class="v">0.4955</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-green">Behav_15（15 行為）</div>
-      <div class="ghbar bin" data-w="97"><span class="t">Binary F1</span><span class="v">0.6800</span></div>
-      <div class="ghbar tri" data-w="69"><span class="t">3-Class F1</span><span class="v">0.4831</span></div></div>
-    <div class="ghc-grp" data-anim><div class="gl em-amber">Core_6（6 核心）</div>
-      <div class="ghbar bin" data-w="87"><span class="t">Binary F1</span><span class="v">0.6082</span></div>
-      <div class="ghbar tri" data-w="60"><span class="t">3-Class F1</span><span class="v">0.4187</span></div></div>
-  </div>
-  <div class="lead" data-anim style="margin-top:2vh;">Binary 普遍比 3-Class 高 <b class="accent">~0.19</b> → 瓶頸是 Normal/Overweight 邊界模糊，<b>非特徵不足</b>。</div>
 </section>
 
 <!-- 13 KEY FINDING -->
@@ -699,8 +700,8 @@ const MODALS={
       <tr><td>4</td><td>不太好</td><td>41,397</td></tr>
       <tr><td>5</td><td>很差</td><td>12,915</td></tr></tbody></table>`},
   conttype:{title:'連續 vs 類別 特徵怎麼處理？',sub:'不同型別、不同編碼策略',html:`
-    <p><b>連續特徵（保留原值）</b>：sleep_hours、drinks_per_week、mental_health_days、physical_health_days。樹模型可直接吃數值。</p>
-    <p><b>類別特徵（Label Encoding）</b>：smoking_status、general_health、age_group、education、income、employment、sex、diff_walking… 轉成整數類別碼。</p>
+    <p><b>連續特徵（保留原值）</b>：sleep_hours（睡眠時數）、drinks_per_week（每週飲酒量）、mental_health_days（心理不適天數）、physical_health_days（身體不適天數）。樹模型可直接吃數值。</p>
+    <p><b>類別特徵（Label Encoding）</b>：smoking_status（吸菸狀態）、general_health（自評健康）、age_group（年齡層）、education（教育程度）、income（收入）、employment（就業狀態）、sex（性別）、diff_walking（行走困難）… 轉成整數類別碼。</p>
     <div class="ev-good">✅ XGBoost / RF 對單調的 Label Encoding 不敏感（以分裂點切分），故未用 One-Hot，避免維度爆炸。</div>`},
   algo_lr:{title:'Logistic Regression — F1 熱圖',sub:'線性基準線 · 三特徵集的演算法×抽樣矩陣',wide:true,html:`
     <p>下方三張為各特徵集的 <b>F1 熱圖</b>（直=演算法、橫=抽樣）。LR 為<b>線性基準線</b>，整體最弱，主要作為對照。</p>
