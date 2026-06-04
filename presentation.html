@@ -277,7 +277,7 @@
   <table class="tbl">
     <thead><tr><th>版本</th><th>資料集</th><th>規模</th><th>為何放棄 / 採用</th></tr></thead>
     <tbody>
-      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Lifestyle and Wellbeing Data</td><td>15,972 × 24</td><td>❌ 生活滿意度問卷、BMI 僅粗略二分、代表性不足</td></tr>
+      <tr class="clk" data-anim data-modal="v1"><td>v1</td><td>Lifestyle and Wellbeing Data</td><td>15,972 × 24</td><td>❌ 資料不足</td></tr>
       <tr class="clk" data-anim data-modal="v2"><td>v2</td><td>Obesity Risk Dataset（Playground S4E2）</td><td>20,800 × 17</td><td>❌ 合成放大資料、BMI 邊界不符 WHO 標準</td></tr>
       <tr class="clk" data-anim data-modal="v3"><td>v3</td><td>Heart Disease（heart_2020_cleaned）</td><td>319,795 × 18</td><td>❌ 第三方清洗僅 18 欄、2020 疫情年、無睡眠</td></tr>
       <tr class="win clk" data-anim data-modal="v4"><td>v4 ✅</td><td>CDC BRFSS 2022 原始 XPT</td><td>445k → 329k</td><td>✅ 官方原始、328 變數可選、含睡眠</td></tr>
@@ -318,7 +318,7 @@
     <div class="head"><h2 data-anim>ETL 關鍵編碼決策</h2><div class="lead" data-anim>魔鬼藏在編碼細節裡</div></div>
     <div class="grid g1">
       <div class="card-i lft clk" data-anim data-modal="menthlth"><div class="t">MENTHLTH / PHYSHLTH = 88</div><div class="d">→ <b>0 天</b>。BRFSS 用 88 代表「沒有任何一天不適」，不可當缺值刪。</div></div>
-      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。v4 新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
+      <div class="card-i lft clk" data-anim data-modal="drnkwk2"><div class="t">_DRNKWK2 = 99900</div><div class="d">→ <b>NaN</b>。最終版新發現的異常編碼，實為無效值佔位（2,114 筆）。</div></div>
       <div class="card-i lft clk" data-anim data-modal="genhlth"><div class="t">GENHLTH 反向處理</div><div class="d">原始 1=最好、5=最差，反向後讓<b>數值方向與風險一致</b>。</div></div>
       <div class="card-i lft clk" data-anim data-modal="conttype"><div class="t">連續 vs 類別</div><div class="d">連續特徵保留原值；類別特徵 <b>Label Encoding</b>。</div></div>
     </div>
@@ -500,7 +500,7 @@
     <div class="half" data-anim><div class="imgcard" style="max-width:360px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
   </div>
   <div class="concl-strip" data-anim style="display:flex; gap:14px; margin-top:2.6vh; width:min(1080px,92vw); justify-content:center; flex-wrap:wrap;">
-    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是 v4 成功的關鍵。</div></div></div>
+    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是最終版成功的關鍵。</div></div></div>
     <div class="cc-mini"><span class="ccn em-green">2</span><div><b>行為足以預測肥胖</b><div class="ccd">6 問達 F1=0.608；15 變數 0.680，僅低全特徵 1%。</div></div></div>
     <div class="cc-mini"><span class="ccn em-amber">3</span><div><b>截面模型有其限制</b><div class="ccd">跨個人預測穩定，縱向敏感度受限，留待未來。</div></div></div>
   </div>
@@ -675,7 +675,7 @@ const MODALS={
       <div class="ev-bar-row"><span>修正前</span><div class="ev-bar-track"><div class="ev-bar-fill amb" style="width:100%"></div></div><span>max = 999</span></div>
       <div class="ev-bar-row"><span>修正後</span><div class="ev-bar-track"><div class="ev-bar-fill" style="width:53%"></div></div><span>max = 532</span></div>
     </div>
-    <div class="ev-good">✅ 移除 <b>2,114 筆</b> 99900 異常碼後，drinks_per_week 上限從 999 → <b>532</b>（回到合理範圍）。這是 v4 才抓到的 bug。</div>`},
+    <div class="ev-good">✅ 移除 <b>2,114 筆</b> 99900 異常碼後，drinks_per_week 上限從 999 → <b>532</b>（回到合理範圍）。這是最終版才抓到的 bug。</div>`},
   genhlth:{title:'GENHLTH 為什麼要反向？',sub:'自評整體健康',html:`
     <p>原始編碼：<b>1=非常好 … 5=很差</b>，<b>7/9</b> = 不知道 / 拒答（已移除）。原始方向是「數值越大越健康」的相反，容易誤讀。</p>
     <p>反向後讓<b>數值越大 = 風險越高</b>，與其他特徵方向一致，模型與圖表更好解讀。</p>
@@ -726,7 +726,7 @@ const MODALS={
       <div class="ks"><div class="ki">Engagement</div><div class="kv">0.132</div><div class="kd">dl / view</div></div>
       <div class="ks"><div class="ki">Comments</div><div class="kv">25</div><div class="kd">posted</div></div>
     </div>
-    <div class="ev-note">❌ 放棄主因：本質是<b>生活滿意度問卷</b>、BMI 僅粗略二分（&lt;/≥25）、樣本偏小且<b>代表性不足</b>。</div>
+    <div class="ev-note">❌ 放棄主因：<b>資料不足</b>——僅 15,972 筆，且為生活滿意度問卷、BMI 僅粗略二分（&lt;/≥25），樣本量與代表性皆不夠。</div>
     <div class="ev-good">✅ 收穫：建立第一版 FastAPI 部署流程與 EDA 範本。</div>`},
   v2:{title:'v2 — Kaggle Obesity Risk Dataset',sub:'20,800+ 筆 × 17 特徵 · Playground Series S4E2',html:`
     <p>來源：Kaggle Playground S4E2，以深度學習從 Palechor &amp; de la Hoz Manotas (2019) 原始肥胖資料<b>合成放大</b>。</p>
@@ -754,7 +754,7 @@ const MODALS={
     </div>
     <div class="ev-note">❌ 放棄主因：① 第三方預處理只剩 <b>18 欄</b>，丟失原始變數 ② 2020 行為受疫情扭曲 ③ <b>無 SLEPTIM1 睡眠</b>變數。</div>
     <div class="ev-good">✅ 收穫：確立 3 特徵集 × 3 演算法 × 3 抽樣 = 27 模型 的實驗框架。</div>`},
-  v4:{title:'v4 — CDC BRFSS 2022 原始 XPT ✅',sub:'445,132 → 329,126 筆 · 我們自己 ETL 的官方原始版',html:`
+  v4:{title:'v4（最終版）— CDC BRFSS 2022 原始 XPT ✅',sub:'445,132 → 329,126 筆 · 我們自己 ETL 的官方原始版',html:`
     <p>回歸 <b>CDC 官方原始 SAS Transport（.XPT）</b>，自己做 ETL，掌握每一個編碼決策——不再依賴任何第三方清洗。</p>
     <table class="ev-table"><tbody>
       <tr><th>原始</th><td class="hl">445,132 筆 × 328 變數</td></tr><tr><th>清理後</th><td class="hl">329,126 筆 × 26 欄</td></tr><tr><th>特徵集</th><td>Full_25 / Behav_15 / Core_6</td></tr></tbody></table>
