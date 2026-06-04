@@ -219,6 +219,16 @@
   .ev-imgs img{width:100%; display:block; border-radius:6px;}
   .ev-imgs figcaption{text-align:center; font-size:12px; color:#334155; margin-top:4px; font-weight:600;}
   .modal-card.wide{max-width:920px;}
+  .mini-bars{margin:8px 0 8px;}
+  .mb-row{display:flex; align-items:center; gap:8px; margin-bottom:6px;}
+  .mb-row .mb-lab{width:62px; text-align:right; flex:none; font-size:11px; color:var(--muted);}
+  .mb-track{flex:1; height:17px; background:#0e1830; border-radius:4px; overflow:hidden;}
+  .mb-fill{height:100%; border-radius:4px; display:flex; align-items:center; justify-content:flex-end; padding-right:7px; font-size:10.5px; font-weight:800; color:#fff;}
+  .smote-cmp{display:flex; gap:16px; margin:16px 0;}
+  .sc-col{flex:1; background:rgba(255,255,255,.03); border:1px solid var(--line); border-radius:12px; padding:14px 16px;}
+  .sc-h{font-weight:800; font-size:15px; text-align:center; margin-bottom:10px;}
+  .sc-col svg{display:block; margin:0 auto 10px;}
+  .sc-col ul{margin:0; padding-left:18px;} .sc-col li{font-size:13px; color:#c7d3ea; line-height:1.6; margin-bottom:3px;}
   .ev-imgs img{cursor:zoom-in;}
   .imgzoom-layer{position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center; pointer-events:none;}
   .imgzoom-layer.show{display:flex;}
@@ -391,12 +401,18 @@
 <!-- 9 EVALUATION -->
 <section class="slide" data-slide="m09">
   <div class="head"><h2 data-anim>評估方法與指標 — <span class="k">公平比較 27 組的共同標準</span></h2></div>
-  <div class="grid g3" style="width:min(1000px,88vw);">
-    <div class="card-i acc-b" data-anim><div class="t">資料切分</div><div class="d"><b>80/20</b> train-test split，<b>stratified</b> 維持各 BMI 類別比例。</div></div>
-    <div class="card-i acc-g" data-anim><div class="t">主指標：Macro F1</div><div class="d">三類不平衡，Accuracy 會被多數類灌水；<b>Macro F1</b> 對少數類更公平。</div></div>
-    <div class="card-i acc-v" data-anim><div class="t">SMOTE 原理</div><div class="d">對少數類在特徵空間「內插」生成合成樣本，<b>只在訓練集做</b>，避免資訊洩漏。</div></div>
+  <div class="grid g3" style="width:min(1080px,90vw); align-items:start;">
+    <div class="card-i acc-b" data-anim><div class="t">✂️ 資料切分</div><div class="d"><b>80/20</b> train-test split，採 <b>stratified</b> 分層抽樣，確保各 BMI 類別比例在訓練集與測試集中一致。</div></div>
+    <div class="card-i acc-g" data-anim><div class="t">📈 主指標：Macro F1</div><div class="d">三類不平衡下，Accuracy 易受多數類主導；<b>Macro F1</b> 對少數類更公平，能反映各類別的真實分類效能。</div></div>
+    <div class="card-i acc-v clk" data-anim data-modal="imbalance"><div class="t">⚖️ 類別不平衡處理</div>
+      <div class="mini-bars">
+        <div class="mb-row"><span class="mb-lab">Normal</span><div class="mb-track"><div class="mb-fill" style="width:33%; background:linear-gradient(90deg,#7f1d1d,#b91c1c)">33%</div></div></div>
+        <div class="mb-row"><span class="mb-lab">OW+Obese</span><div class="mb-track"><div class="mb-fill" style="width:67%; background:linear-gradient(90deg,#c2410c,#ea580c)">67%</div></div></div>
+      </div>
+      <div class="d">資料分佈約 <b>1:2</b>。SMOTE 對少數類內插合成（僅訓練集）、避免洩漏。<span class="accent">點看 SMOTE vs 欠採樣 →</span></div>
+    </div>
   </div>
-  <div class="lead" data-anim style="margin-top:3vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
+  <div class="lead" data-anim style="margin-top:2.6vh;">統一的切分與指標，是 27 組模型能放在同一張表比較的前提。</div>
 </section>
 
 <!-- 10 27 MATRIX -->
@@ -739,6 +755,31 @@ const MODALS={
     <p><b>連續特徵（保留原值）</b>：sleep_hours（睡眠時數）、drinks_per_week（每週飲酒量）、mental_health_days（心理不適天數）、physical_health_days（身體不適天數）。樹模型可直接吃數值。</p>
     <p><b>類別特徵（Label Encoding）</b>：smoking_status（吸菸狀態）、general_health（自評健康）、age_group（年齡層）、education（教育程度）、income（收入）、employment（就業狀態）、sex（性別）、diff_walking（行走困難）… 轉成整數類別碼。</p>
     <div class="ev-good">✅ XGBoost / RF 對單調的 Label Encoding 不敏感（以分裂點切分），故未用 One-Hot，避免維度爆炸。</div>`},
+  imbalance:{title:'類別不平衡：為何選 SMOTE？',sub:'過採樣 SMOTE vs 欠採樣 Undersampling',wide:true,html:`
+    <p>BMI 二元標籤約 <b>1:2</b>（Normal 33% vs Overweight+Obese 67%）。處理不平衡有兩條路：</p>
+    <div class="smote-cmp">
+      <div class="sc-col">
+        <div class="sc-h em-green">SMOTE 法（少數類過採樣）</div>
+        <svg width="190" height="110" viewBox="0 0 190 110">
+          <g stroke="#f9a87c" stroke-width="1.4" opacity=".55"><line x1="45" y1="38" x2="80" y2="28"/><line x1="80" y1="28" x2="105" y2="58"/><line x1="105" y1="58" x2="65" y2="72"/><line x1="65" y1="72" x2="92" y2="95"/><line x1="45" y1="38" x2="65" y2="72"/></g>
+          <g fill="#ea580c"><circle cx="45" cy="38" r="6"/><circle cx="80" cy="28" r="6"/><circle cx="105" cy="58" r="6"/><circle cx="65" cy="72" r="6"/><circle cx="92" cy="95" r="6"/></g>
+          <g fill="#1b2747" stroke="#fb923c" stroke-width="2"><circle cx="62" cy="33" r="5"/><circle cx="92" cy="43" r="5"/><circle cx="85" cy="65" r="5"/><circle cx="78" cy="83" r="5"/></g>
+          <text x="128" y="100" fill="#fb923c" font-size="11" font-weight="700">＋合成樣本</text>
+        </svg>
+        <ul><li>特徵空間<b>插值合成</b>新少數類樣本</li><li>僅應用於<b>訓練集</b>，避免洩漏</li><li class="em-green">27 組合中<b>最穩定</b> ✅</li></ul>
+      </div>
+      <div class="sc-col">
+        <div class="sc-h em-red">欠採樣法（多數類欠採樣）</div>
+        <svg width="190" height="110" viewBox="0 0 190 110">
+          <g fill="#34d399"><circle cx="30" cy="45" r="6"/><circle cx="48" cy="62" r="6"/><circle cx="34" cy="78" r="6"/></g>
+          <g fill="#1b2747" stroke="#64748b" stroke-width="2"><circle cx="95" cy="30" r="6"/><circle cx="120" cy="48" r="6"/><circle cx="150" cy="34" r="6"/><circle cx="108" cy="66" r="6"/><circle cx="160" cy="62" r="6"/><circle cx="124" cy="88" r="6"/></g>
+          <g stroke="#ef4444" stroke-width="2"><path d="M91 26 l8 8 M99 26 l-8 8"/><path d="M146 30 l8 8 M154 30 l-8 8"/><path d="M156 58 l8 8 M164 58 l-8 8"/><path d="M120 84 l8 8 M128 84 l-8 8"/></g>
+          <text x="20" y="22" fill="#34d399" font-size="10">少數類保留</text><text x="118" y="106" fill="#ef4444" font-size="10">✕ 丟棄多數類</text>
+        </svg>
+        <ul><li><b>丟棄</b>多數類數據</li><li class="em-red">不可逆<b>資訊損失</b></li><li>性能較不穩定</li></ul>
+      </div>
+    </div>
+    <div class="ev-good">🔑 關鍵原則：SMOTE <b>僅套用於訓練集</b>，測試集保持原始分佈，確保評估結果真實反映模型<b>泛化能力</b>。</div>`},
   best:{title:'🏆 最佳組合：XGBoost + SMOTE',sub:'F1 熱圖（3×3 全貌）＋ 混淆矩陣 · 皆為二元',wide:true,html:`
     <p>27 組中 <b class="em-green">XGBoost + SMOTE</b> 在三個特徵集<b>全數奪冠</b>（Full_25=0.687 / Behav_15=0.680 / Core_6=0.608）。下方每張 F1 熱圖即該特徵集「3 演算法 × 3 抽樣」的完整成績，右下角 XGBoost×SMOTE 為最佳格。</p>
     <div class="ev-imgs">
