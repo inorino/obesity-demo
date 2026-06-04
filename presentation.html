@@ -265,6 +265,15 @@
     font-weight:800; font-size:16px; background:rgba(255,255,255,.05);}
   .cc-mini b{font-size:clamp(13px,1.4vw,17px);}
   .cc-mini .ccd{color:var(--muted); font-size:clamp(11px,1.2vw,13.5px); margin-top:3px; line-height:1.45;}
+  .concl3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; width:min(1180px,93vw); align-items:start;}
+  .concl-card{background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column;}
+  .concl-card img{width:100%; height:clamp(110px,17vh,170px); object-fit:cover; display:block;}
+  .concl-card .ic-body{padding:13px 16px 16px;}
+  .ic-tag{display:inline-block; background:rgba(251,146,60,.14); color:#fb923c; border:1px solid rgba(251,146,60,.35); border-radius:6px; padding:2px 10px; font-size:11px; font-weight:600; margin-bottom:8px;}
+  .ic-h{font-size:clamp(15px,1.65vw,20px); font-weight:800; line-height:1.4; margin-bottom:8px;}
+  .ic-h .kw{color:#fb923c;}
+  .ic-d{font-size:clamp(12px,1.25vw,14.5px); color:var(--muted); line-height:1.6;}
+  .ic-d b{color:#fff;}
   .src{display:flex; flex-direction:column; gap:11px; margin-top:8px;}
   .src-i{border-left:2px solid var(--line); padding:3px 0 3px 12px; line-height:1.4;}
   .src-i b{display:block; color:#fff; font-size:clamp(13px,1.4vw,16px);}
@@ -538,33 +547,43 @@
 
 <!-- 18 DISCUSSION + CONCLUSION -->
 <section class="slide" data-slide="m18">
-  <div class="head"><h2 data-anim>Discussion ＋ 結論<span class="k"> · 截面資料的限制與總結</span></h2></div>
-  <div class="row2" style="align-items:flex-start;">
-    <div class="half" style="flex-direction:column; align-items:stretch; gap:12px; display:flex;">
+  <div class="head"><h2 data-anim>Discussion<span class="k">：截面資料的根本限制</span></h2></div>
+  <div class="row2" style="align-items:center;">
+    <div class="half" style="flex-direction:column; align-items:stretch; gap:14px; display:flex;">
       <div class="card-i acc-a" data-anim><div class="t">觀察到的異常</div><div class="d">男性行為全部改善時，Core_6 機率<b class="em-green">正確下降</b>，但 Behav_15 卻從 <b>50% 升到 72%</b>。</div></div>
       <div class="card-i acc-v" data-anim><div class="t">原因解析</div><div class="d">sex=1（男）+ age_group=6（中年）是<b>強錨點</b>；截面非縱向，模型學到「中年男性群體風險偏高」，無法捕捉個人縱向改變。</div></div>
       <div class="lead" data-anim style="text-align:left;"><b class="em-green">Core_6 無人口錨定，方向反而更穩定。</b></div>
     </div>
-    <div class="half" data-anim><div class="imgcard" style="max-width:360px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
-  </div>
-  <div class="concl-strip" data-anim style="display:flex; gap:14px; margin-top:2.6vh; width:min(1080px,92vw); justify-content:center; flex-wrap:wrap;">
-    <div class="cc-mini"><span class="ccn accent">1</span><div><b>資料為王</b><div class="ccd">回歸 CDC 原始 XPT，是最終版成功的關鍵。</div></div></div>
-    <div class="cc-mini"><span class="ccn em-green">2</span><div><b>行為足以預測肥胖</b><div class="ccd">6 問達 F1=0.608；15 變數 0.680，僅低全特徵 1%。</div></div></div>
-    <div class="cc-mini"><span class="ccn em-amber">3</span><div><b>截面模型有其限制</b><div class="ccd">跨個人預測穩定，縱向敏感度受限，留待未來。</div></div></div>
+    <div class="half" data-anim><div class="imgcard" style="max-width:410px;"><img src="assets/img/s18_diagram.png" alt="截面 vs 縱向追蹤"></div></div>
   </div>
 </section>
 
-<!-- 19 FUTURE WORK -->
-<section class="slide split" data-slide="m19">
-  <div class="col-main">
-    <div class="head"><h2 data-anim>Future Work：<span class="k">從預測到介入</span></h2></div>
-    <div class="grid g1">
-      <div class="card-i acc-b" data-anim><div class="t">⌚ 整合穿戴式裝置</div><div class="d">結合 Apple Watch、Fitbit 4–12 週資料，捕捉同一人不同時間點的行為與 BMI 變化。</div></div>
-      <div class="card-i acc-v" data-anim><div class="t">💊 臨床藥物效果模擬</div><div class="d">疊加 STEP-1（Semaglutide −14.9%）與 SURMOUNT-1（Tirzepatide −20.9%）文獻數據。</div></div>
-      <div class="card-i acc-g" data-anim><div class="t">🧪 介入策略 A/B 測試</div><div class="d">以 Core_6 預測風險 → 建議行為改變 → 4 週後再預測，量化介入效果。</div></div>
+<!-- 18 CONCLUSIONS（三個關鍵洞察，取代原 Future Work）-->
+<section class="slide" data-slide="m19">
+  <div class="head"><h2 data-anim>結論：<span class="k">三個關鍵洞察</span></h2></div>
+  <div class="concl3">
+    <div class="concl-card" data-anim>
+      <img src="assets/img/insight1.png" alt="">
+      <div class="ic-body"><div class="ic-tag">洞察一</div>
+        <div class="ic-h"><span class="kw">行為即足</span> — 不需病史，問生活就好</div>
+        <div class="ic-d">僅 6 個日常行為，F1 達 <b>0.61</b>；15 項行為達 <b>0.68</b>，與 25 變數（含 7 項慢性病史）差距 <b>&lt;1%</b>。預測肥胖風險，不必碰醫療隱私。</div>
+      </div>
+    </div>
+    <div class="concl-card" data-anim>
+      <img src="assets/img/insight2.jpg" alt="">
+      <div class="ic-body"><div class="ic-tag">洞察二</div>
+        <div class="ic-h"><span class="kw">資料為王</span> — 回歸一手，才是轉捩點</div>
+        <div class="ic-d">換過 4 個資料集，前 3 個（Kaggle 合成／二手清洗）全失敗；直到回 <b>CDC 原始 XPT</b> 自行 ETL 才成功。模型再強，也救不了壞資料。</div>
+      </div>
+    </div>
+    <div class="concl-card" data-anim>
+      <img src="assets/img/insight3.jpg" alt="">
+      <div class="ic-body"><div class="ic-tag">洞察三</div>
+        <div class="ic-h"><span class="kw">準而不續</span> — 能判當下，難追縱向</div>
+        <div class="ic-d">模型能準確判斷「當下風險」，但同一人逐週預測在 <b>4.7%–67.6%</b> 劇烈跳動——截面資料沒有時間概念。個人化長期追蹤需靠縱貫／穿戴資料（Future Work）。</div>
+      </div>
     </div>
   </div>
-  <div class="col-photo" data-anim><img src="assets/img/s19_hero.png" alt=""></div>
 </section>
 
 <!-- 20 END + ACKNOWLEDGEMENT -->
